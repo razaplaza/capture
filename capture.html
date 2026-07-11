@@ -140,6 +140,34 @@
     padding:12px; border-radius:50%; background:rgba(10,10,12,0.55); backdrop-filter:blur(6px); color:var(--ivory-100); }
   .cam-flip svg { width:20px; height:20px; display:block; }
 
+  .cam-opts {
+    position:absolute; left:0; right:0; bottom:calc(var(--safe-bot) + 118px); z-index:5;
+    display:flex; justify-content:center; gap:8px; flex-wrap:wrap; padding:0 14px;
+  }
+  .opt-chip {
+    padding:7px 13px; border-radius:999px; font-size:12.5px; font-weight:600;
+    background:rgba(10,10,12,0.55); border:1px solid rgba(255,255,255,0.18);
+    color:var(--ivory-100); backdrop-filter:blur(6px);
+  }
+  .opt-chip:active { background:rgba(255,122,26,0.3); }
+  .opt-chip .k { color:var(--ivory-400); font-weight:400; margin-right:4px; font-size:10.5px; }
+
+  .import-btn {
+    width:100%; display:flex; align-items:center; gap:12px; padding:13px 16px; margin-bottom:6px;
+    background:var(--ink-100); border:1px solid var(--ink-300); border-radius:var(--r-lg);
+    font-size:14.5px; font-weight:600; color:var(--ivory-300); text-align:left;
+  }
+  .import-btn:active { background:var(--ink-200); }
+  .import-btn svg { width:20px; height:20px; flex-shrink:0; }
+  .import-btn .m-sub { display:block; font-size:11px; font-weight:400; color:var(--ivory-500); }
+  body.importing .stroke-btn { border-color:rgba(106,169,255,0.5); }
+  .import-banner {
+    display:none; padding:10px 14px; margin-bottom:12px; border-radius:var(--r);
+    background:rgba(106,169,255,0.12); border:1px solid rgba(106,169,255,0.4);
+    color:var(--blue); font-size:13px; font-weight:600;
+  }
+  body.importing .import-banner { display:block; }
+
   .toast {
     position:fixed; left:50%; bottom:calc(var(--safe-bot) + 20px); transform:translateX(-50%) translateY(20px);
     background:var(--ink-100); border:1px solid var(--ink-400); color:var(--ivory-100);
@@ -156,10 +184,17 @@
   <div class="brand"><span class="dot"></span><span class="name">Replay Capture</span></div>
   <div class="sub">Pick what you're filming — takes are named so your PC files them automatically.</div>
 
-  <button class="match-btn" onclick="openCam('match')">
+  <button class="match-btn" onclick="pickTarget('match')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><line x1="12" y1="6" x2="12" y2="18"/></svg>
     <span>Record a match<span class="m-sub">full game — serves get detected later</span></span>
   </button>
+
+  <div class="import-banner">Importing from Photos — now tap the stroke this video shows (or Match). Tap again to cancel.</div>
+  <button class="import-btn" onclick="toggleImport()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+    <span>Label a video from Photos<span class="m-sub">for takes filmed in the native Camera app (Cinematic, 4K…)</span></span>
+  </button>
+  <input type="file" id="importPick" accept="video/*" style="display:none" onchange="onImportPick(event)" />
 
   <div id="strokes"></div>
 
@@ -184,6 +219,7 @@
   <button class="cam-flip" onclick="flipCam()" title="Flip camera">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 19H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5"/><path d="M13 5h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-5"/><circle cx="12" cy="12" r="3"/></svg>
   </button>
+  <div class="cam-opts" id="camOpts"></div>
   <div class="cam-bottom">
     <button class="rec-btn" id="recBtn" onclick="toggleRec()"><span class="core"></span></button>
   </div>
@@ -237,7 +273,7 @@ function fmtDur(s) { return Math.floor(s/60) + ':' + pad(Math.floor(s%60)); }
 function renderHome() {
   document.getElementById('strokes').innerHTML = Object.entries(TREE).map(([pid, p]) =>
     `<div class="pillar-title">${p.name}</div><div class="stroke-grid">` +
-    p.strokes.map(([id, n]) => `<button class="stroke-btn" onclick="openCam('${id}')">${n}<span class="n">${id}</span></button>`).join('') +
+    p.strokes.map(([id, n]) => `<button class="stroke-btn" onclick="pickTarget('${id}')">${n}<span class="n">${id}</span></button>`).join('') +
     `</div>`).join('');
   renderTakes();
 }
@@ -274,10 +310,61 @@ async function delTake(id) {
   await dbDel(id); renderTakes();
 }
 
+// ── camera settings (persisted) ──
+const RES = [ [1280,720,'720p'], [1920,1080,'1080p'], [3840,2160,'4K'] ];
+const FPS = [30, 60];
+const LIMITS = [ [0,'no limit'], [30,'30s'], [60,'1m'], [300,'5m'], [600,'10m'] ];
+let cfg = { res:1, fps:1, limit:0, lens:'' };
+try { Object.assign(cfg, JSON.parse(localStorage.getItem('cap_cfg') || '{}')); } catch(e) {}
+function saveCfg() { localStorage.setItem('cap_cfg', JSON.stringify(cfg)); }
+let lenses = [];  // back cameras on multi-lens phones
+
+async function listLenses() {
+  try {
+    const devs = await navigator.mediaDevices.enumerateDevices();
+    lenses = devs.filter(d => d.kind === 'videoinput' && !/front|user|face/i.test(d.label));
+  } catch(e) { lenses = []; }
+}
+function lensLabel(d) {
+  const l = (d.label || '').toLowerCase();
+  if (l.includes('ultra')) return '0.5x';
+  if (l.includes('tele')) return '3x';
+  if (l.includes('back')) return '1x';
+  return (d.label || 'cam').slice(0, 6);
+}
+function cycle(key, arr) {
+  cfg[key] = (cfg[key] + 1) % arr.length;
+  saveCfg(); renderOpts(); startStream();
+}
+function cycleLens() {
+  if (lenses.length < 2) return;
+  const i = lenses.findIndex(d => d.deviceId === cfg.lens);
+  cfg.lens = lenses[(i + 1) % lenses.length].deviceId;
+  saveCfg(); renderOpts(); startStream();
+}
+function renderOpts() {
+  const host = document.getElementById('camOpts');
+  if (!host) return;
+  const cur = lenses.find(d => d.deviceId === cfg.lens);
+  host.innerHTML =
+    (lenses.length > 1 ? `<button class="opt-chip" onclick="cycleLens()"><span class="k">lens</span>${cur ? lensLabel(cur) : '1x'}</button>` : '') +
+    `<button class="opt-chip" onclick="cycle('res', RES)">${RES[cfg.res][2]}</button>` +
+    `<button class="opt-chip" onclick="cycle('fps', FPS)">${FPS[cfg.fps]} fps</button>` +
+    `<button class="opt-chip" onclick="cycle('limit', LIMITS)"><span class="k">auto-stop</span>${LIMITS[cfg.limit][1]}</button>`;
+}
+
 // ── camera ──
-let stream = null, rec = null, chunks = [], recStart = 0, timerH = null;
+let stream = null, rec = null, chunks = [], recStart = 0, timerH = null, limitH = null;
 let camStroke = null, facing = 'environment', takeNo = 1;
 
+function pickTarget(strokeId) {
+  if (importing) {
+    importStroke = strokeId;
+    document.getElementById('importPick').click();
+    return;
+  }
+  openCam(strokeId);
+}
 async function openCam(strokeId) {
   camStroke = strokeId;
   takeNo = 1;
@@ -286,15 +373,20 @@ async function openCam(strokeId) {
   document.getElementById('cam').classList.add('on');
   updateCount();
   await startStream();
+  await listLenses();   // labels only exist after permission granted
+  renderOpts();
 }
 async function startStream() {
   stopStream();
   try {
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { ideal: facing }, width: { ideal: 1920 }, height: { ideal: 1080 }, frameRate: { ideal: 60 } },
-      audio: true,
-    });
+    const [w, h] = RES[cfg.res];
+    const video = { width: { ideal: w }, height: { ideal: h }, frameRate: { ideal: FPS[cfg.fps] } };
+    if (cfg.lens && facing === 'environment') video.deviceId = { exact: cfg.lens };
+    else video.facingMode = { ideal: facing };
+    stream = await navigator.mediaDevices.getUserMedia({ video, audio: true });
     document.getElementById('preview').srcObject = stream;
+    const st = stream.getVideoTracks()[0].getSettings();
+    if (st.width) toast(`${st.width}x${st.height} @ ${st.frameRate || '?'}fps`);
   } catch (e) {
     toast('Camera blocked: ' + e.message);
     closeCam();
@@ -329,7 +421,8 @@ function toggleRec() {
   if (!rec) {
     chunks = [];
     const mime = pickMime();
-    try { rec = new MediaRecorder(stream, mime ? { mimeType: mime, videoBitsPerSecond: 12_000_000 } : undefined); }
+    const bps = [8_000_000, 14_000_000, 45_000_000][cfg.res];
+    try { rec = new MediaRecorder(stream, mime ? { mimeType: mime, videoBitsPerSecond: bps } : undefined); }
     catch (e) { toast('Recording not supported: ' + e.message); return; }
     rec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
     rec.onstop = saveTake;
@@ -337,13 +430,19 @@ function toggleRec() {
     recStart = Date.now();
     btn.classList.add('rec');
     timer.classList.add('rec');
-    timerH = setInterval(() => { timer.textContent = fmtDur((Date.now() - recStart) / 1000); }, 250);
+    const lim = LIMITS[cfg.limit][0];
+    timerH = setInterval(() => {
+      const el = (Date.now() - recStart) / 1000;
+      timer.textContent = lim ? '-' + fmtDur(Math.max(0, lim - el)) : fmtDur(el);
+    }, 250);
+    if (lim) limitH = setTimeout(() => { if (rec) toggleRec(); }, lim * 1000);
   } else {
     rec.stop();
     rec = null;
     btn.classList.remove('rec');
     timer.classList.remove('rec');
     clearInterval(timerH);
+    clearTimeout(limitH);
     timer.textContent = '0:00';
   }
 }
@@ -361,6 +460,27 @@ async function saveTake() {
   takeNo++;
   updateCount();
   toast(`Saved · ${NAME[camStroke]} take ${takeNo - 1} (${fmtDur(dur)})`);
+}
+
+// ── import from Photos: label a natively-filmed video (Cinematic, 4K...) ──
+let importing = false;
+function toggleImport() {
+  importing = !importing;
+  document.body.classList.toggle('importing', importing);
+}
+let importStroke = null;
+function onImportPick(e) {
+  const f = e.target.files[0];
+  e.target.value = '';
+  if (!f || !importStroke) return;
+  const ts = f.lastModified && f.lastModified > 631152000000 ? new Date(f.lastModified) : new Date();
+  const ext = (f.name.split('.').pop() || 'mp4').toLowerCase();
+  const name = `replay~${importStroke}~${stamp(ts)}~1.${ext}`;
+  dbPut({ id: Date.now().toString(36) + Math.random().toString(36).slice(2),
+          strokeId: importStroke, name, blob: f, size: f.size, dur: 0, createdAt: ts.getTime() })
+    .then(() => { toast('Labeled as ' + (NAME[importStroke] || importStroke)); renderTakes(); });
+  importing = false; importStroke = null;
+  document.body.classList.remove('importing');
 }
 
 // keep screen awake while camera screen is open (iOS 16.4+)
