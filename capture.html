@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+<title>Replay Capture</title>
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="theme-color" content="#0a0a0c" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="icon-180.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink-000:#0a0a0c; --ink-050:#101013; --ink-100:#15161a;
+    --ink-200:#1c1d23; --ink-300:#25272f; --ink-400:#31343e;
+    --ivory-100:#f4efe6; --ivory-300:#b9b2a4; --ivory-400:#8a8578; --ivory-500:#5f5b53;
+    --ball:#ff7a1a; --ball-soft:#ff8f3a; --ball-deep:#e86200;
+    --ball-glow:rgba(255,122,26,0.18);
+    --green:#5cd99a; --red:#ff5a5a; --blue:#6aa9ff;
+    --r:10px; --r-lg:14px;
+    --sans:'Inter',system-ui,sans-serif; --display:'Fraunces',Georgia,serif; --mono:'JetBrains Mono',monospace;
+    --safe-top:env(safe-area-inset-top, 0px); --safe-bot:env(safe-area-inset-bottom, 0px);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { height:100%; }
+  body {
+    font-family:var(--sans); background:var(--ink-000); color:var(--ivory-100);
+    font-size:15px; line-height:1.5; overflow:hidden; user-select:none; -webkit-user-select:none;
+    -webkit-font-smoothing:antialiased;
+  }
+  button { font-family:var(--sans); border:none; background:none; color:inherit; cursor:pointer; }
+
+  .screen { position:fixed; inset:0; display:none; flex-direction:column; }
+  .screen.on { display:flex; }
+
+  /* ============ HOME ============ */
+  #home { padding:calc(var(--safe-top) + 18px) 18px calc(var(--safe-bot) + 18px); overflow-y:auto; display:none; }
+  #home.on { display:block; }
+  .brand { display:flex; align-items:center; gap:10px; margin-bottom:4px; }
+  .brand .dot {
+    width:22px; height:22px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #fff, var(--ball-soft) 55%, var(--ball-deep));
+    box-shadow:0 0 14px var(--ball-glow), inset 0 -2px 5px rgba(0,0,0,0.25);
+  }
+  .brand .name { font-family:var(--display); font-size:22px; font-weight:500; }
+  .sub { font-size:12.5px; color:var(--ivory-400); margin-bottom:18px; }
+
+  .match-btn {
+    width:100%; display:flex; align-items:center; gap:12px; padding:16px;
+    background:linear-gradient(180deg, rgba(255,122,26,0.10), rgba(255,122,26,0.04));
+    border:1px solid rgba(255,122,26,0.4); border-radius:var(--r-lg);
+    font-size:16px; font-weight:600; color:var(--ball-soft); margin-bottom:20px;
+  }
+  .match-btn:active { background:rgba(255,122,26,0.18); }
+  .match-btn svg { width:22px; height:22px; }
+  .match-btn .m-sub { display:block; font-size:11.5px; font-weight:400; color:var(--ivory-400); }
+
+  .pillar-title {
+    font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--ivory-500); margin:16px 0 8px 2px;
+  }
+  .stroke-grid { display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+  .stroke-btn {
+    padding:15px 12px; background:var(--ink-100); border:1px solid var(--ink-300);
+    border-radius:var(--r); font-size:15px; font-weight:600; color:var(--ivory-100); text-align:left;
+  }
+  .stroke-btn:active { background:var(--ink-200); border-color:var(--ink-400); }
+  .stroke-btn .n { display:block; font-family:var(--mono); font-size:10px; font-weight:400; color:var(--ivory-500); margin-top:2px; }
+
+  /* takes */
+  .takes-head { display:flex; align-items:baseline; gap:10px; margin:26px 0 10px 2px; }
+  .takes-head h2 { font-family:var(--display); font-size:18px; font-weight:500; }
+  .takes-head .k { font-family:var(--mono); font-size:11px; color:var(--ivory-500); }
+  .take {
+    display:flex; align-items:center; gap:11px; padding:11px 12px; margin-bottom:8px;
+    background:var(--ink-100); border:1px solid var(--ink-200); border-radius:var(--r);
+  }
+  .take .t-dot { width:9px; height:9px; border-radius:50%; background:var(--ball); flex-shrink:0; }
+  .take .t-info { flex:1; min-width:0; }
+  .take .t-name { font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .take .t-meta { font-family:var(--mono); font-size:10.5px; color:var(--ivory-500); }
+  .take button { padding:9px; border-radius:8px; background:var(--ink-200); color:var(--ivory-300); flex-shrink:0; }
+  .take button:active { background:var(--ink-300); }
+  .take button svg { width:16px; height:16px; display:block; }
+  .take .t-del { color:var(--ivory-500); }
+  .take .t-del:active { color:var(--red); }
+  .export-all {
+    width:100%; padding:14px; margin-top:4px; border-radius:var(--r);
+    background:rgba(106,169,255,0.12); border:1px solid rgba(106,169,255,0.4);
+    color:var(--blue); font-size:14.5px; font-weight:600;
+  }
+  .export-all:active { background:rgba(106,169,255,0.2); }
+  .takes-empty { padding:22px; text-align:center; color:var(--ivory-500); font-size:13px; border:1.5px dashed var(--ink-300); border-radius:var(--r-lg); }
+  .hint { margin-top:14px; font-size:11.5px; color:var(--ivory-500); line-height:1.7; }
+  .hint b { color:var(--ivory-400); }
+
+  /* ============ CAMERA ============ */
+  #cam { background:#000; }
+  #cam video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .cam-top {
+    position:absolute; top:0; left:0; right:0; z-index:5;
+    padding:calc(var(--safe-top) + 12px) 16px 30px;
+    display:flex; align-items:center; gap:10px;
+    background:linear-gradient(180deg, rgba(0,0,0,0.55), transparent);
+  }
+  .cam-back { padding:8px 10px; border-radius:9px; background:rgba(10,10,12,0.55); color:var(--ivory-100); backdrop-filter:blur(6px); }
+  .cam-back svg { width:18px; height:18px; display:block; }
+  .cam-stroke {
+    display:inline-flex; align-items:center; gap:8px; padding:7px 14px; border-radius:999px;
+    background:rgba(10,10,12,0.55); border:1px solid rgba(255,122,26,0.5); backdrop-filter:blur(6px);
+    font-size:14px; font-weight:600;
+  }
+  .cam-stroke .cd { width:8px; height:8px; border-radius:50%; background:var(--ball); }
+  .cam-timer {
+    margin-left:auto; font-family:var(--mono); font-size:15px; padding:7px 12px; border-radius:9px;
+    background:rgba(10,10,12,0.55); backdrop-filter:blur(6px); color:var(--ivory-300);
+  }
+  .cam-timer.rec { color:#fff; background:rgba(255,60,60,0.7); }
+  .cam-bottom {
+    position:absolute; bottom:0; left:0; right:0; z-index:5;
+    padding:26px 0 calc(var(--safe-bot) + 26px);
+    display:flex; align-items:center; justify-content:center; gap:38px;
+    background:linear-gradient(0deg, rgba(0,0,0,0.55), transparent);
+  }
+  .rec-btn {
+    width:76px; height:76px; border-radius:50%; border:4px solid rgba(255,255,255,0.85);
+    display:flex; align-items:center; justify-content:center; background:transparent;
+  }
+  .rec-btn .core { width:58px; height:58px; border-radius:50%; background:var(--red); transition:all .18s; }
+  .rec-btn.rec .core { width:30px; height:30px; border-radius:8px; }
+  .cam-count {
+    position:absolute; left:24px; bottom:calc(var(--safe-bot) + 44px); z-index:5;
+    font-family:var(--mono); font-size:12px; color:var(--ivory-300);
+    background:rgba(10,10,12,0.55); padding:6px 11px; border-radius:999px; backdrop-filter:blur(6px);
+  }
+  .cam-flip { position:absolute; right:24px; bottom:calc(var(--safe-bot) + 40px); z-index:5;
+    padding:12px; border-radius:50%; background:rgba(10,10,12,0.55); backdrop-filter:blur(6px); color:var(--ivory-100); }
+  .cam-flip svg { width:20px; height:20px; display:block; }
+
+  .toast {
+    position:fixed; left:50%; bottom:calc(var(--safe-bot) + 20px); transform:translateX(-50%) translateY(20px);
+    background:var(--ink-100); border:1px solid var(--ink-400); color:var(--ivory-100);
+    padding:10px 18px; border-radius:999px; font-size:13.5px; z-index:99; opacity:0;
+    transition:all .22s; pointer-events:none; white-space:nowrap;
+  }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- ============ HOME ============ -->
+<div class="screen on" id="home">
+  <div class="brand"><span class="dot"></span><span class="name">Replay Capture</span></div>
+  <div class="sub">Pick what you're filming — takes are named so your PC files them automatically.</div>
+
+  <button class="match-btn" onclick="openCam('match')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><line x1="12" y1="6" x2="12" y2="18"/></svg>
+    <span>Record a match<span class="m-sub">full game — serves get detected later</span></span>
+  </button>
+
+  <div id="strokes"></div>
+
+  <div class="takes-head"><h2>Takes on this phone</h2><span class="k" id="takeCount"></span></div>
+  <div id="takeList"></div>
+
+  <div class="hint">
+    <b>Getting takes to your PC:</b> tap ⇪ on a take → AirDrop / Save to Files / Drive — any route works.
+    Keep the filename. Desktop Replay reads it and files the video into the right stroke with the right date automatically.
+  </div>
+</div>
+
+<!-- ============ CAMERA ============ -->
+<div class="screen" id="cam">
+  <video id="preview" autoplay playsinline muted></video>
+  <div class="cam-top">
+    <button class="cam-back" onclick="closeCam()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <span class="cam-stroke"><span class="cd"></span><span id="camStrokeName"></span></span>
+    <span class="cam-timer" id="camTimer">0:00</span>
+  </div>
+  <span class="cam-count" id="camCount"></span>
+  <button class="cam-flip" onclick="flipCam()" title="Flip camera">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 19H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5"/><path d="M13 5h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-5"/><circle cx="12" cy="12" r="3"/></svg>
+  </button>
+  <div class="cam-bottom">
+    <button class="rec-btn" id="recBtn" onclick="toggleRec()"><span class="core"></span></button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+// same stroke tree as desktop Replay — ids must match for auto-filing
+const TREE = {
+  forehand: { name:'Forehand', strokes:[['fh_loop','Loop'],['fh_flick','Flick'],['fh_push','Push'],['fh_drive','Drive']] },
+  backhand: { name:'Backhand', strokes:[['bh_loop','Loop'],['bh_flick','Flick'],['bh_push','Push'],['bh_block','Block']] },
+  serve:    { name:'Serve',    strokes:[['sv_pendulum','Pendulum'],['sv_tomahawk','Tomahawk'],['sv_backspin','Backspin'],['sv_backhand','Backhand serve']] },
+  receive:  { name:'Receive',  strokes:[['rc_flick','Flick'],['rc_push','Push'],['rc_banana','Banana']] },
+};
+const NAME = { match:'Match' };
+Object.values(TREE).forEach(p => p.strokes.forEach(([id, n]) => NAME[id] = p.name + ' ' + n));
+
+// ── IndexedDB take store ──
+let _db = null;
+function db() {
+  if (_db) return Promise.resolve(_db);
+  return new Promise((res, rej) => {
+    const rq = indexedDB.open('replay_capture', 1);
+    rq.onupgradeneeded = e => e.target.result.createObjectStore('takes', { keyPath:'id' });
+    rq.onsuccess = e => { _db = e.target.result; res(_db); };
+    rq.onerror = e => rej(e.target.error);
+  });
+}
+async function dbAll() {
+  const d = await db();
+  return new Promise(res => {
+    const rq = d.transaction('takes').objectStore('takes').getAll();
+    rq.onsuccess = () => res(rq.result || []);
+  });
+}
+async function dbPut(t) { const d = await db(); return new Promise(res => { const tx = d.transaction('takes','readwrite'); tx.objectStore('takes').put(t); tx.oncomplete = res; }); }
+async function dbDel(id) { const d = await db(); return new Promise(res => { const tx = d.transaction('takes','readwrite'); tx.objectStore('takes').delete(id); tx.oncomplete = res; }); }
+
+function toast(m) {
+  const t = document.getElementById('toast');
+  t.textContent = m; t.classList.add('show');
+  clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 2200);
+}
+function pad(n) { return String(n).padStart(2, '0'); }
+function stamp(d) { return d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate()) + '-' + pad(d.getHours()) + pad(d.getMinutes()) + pad(d.getSeconds()); }
+function fmtDur(s) { return Math.floor(s/60) + ':' + pad(Math.floor(s%60)); }
+
+// ── home ──
+function renderHome() {
+  document.getElementById('strokes').innerHTML = Object.entries(TREE).map(([pid, p]) =>
+    `<div class="pillar-title">${p.name}</div><div class="stroke-grid">` +
+    p.strokes.map(([id, n]) => `<button class="stroke-btn" onclick="openCam('${id}')">${n}<span class="n">${id}</span></button>`).join('') +
+    `</div>`).join('');
+  renderTakes();
+}
+async function renderTakes() {
+  const takes = (await dbAll()).sort((a, b) => b.createdAt - a.createdAt);
+  document.getElementById('takeCount').textContent = takes.length ? takes.length + ' · ' + (takes.reduce((s,t) => s + t.size, 0) / 1e6).toFixed(0) + ' MB' : '';
+  const host = document.getElementById('takeList');
+  if (!takes.length) { host.innerHTML = '<div class="takes-empty">No takes yet — pick a stroke above and hit record.</div>'; return; }
+  host.innerHTML = takes.map(t => `
+    <div class="take">
+      <span class="t-dot"></span>
+      <div class="t-info">
+        <div class="t-name">${NAME[t.strokeId] || t.strokeId}</div>
+        <div class="t-meta">${fmtDur(t.dur)} · ${(t.size/1e6).toFixed(1)} MB · ${new Date(t.createdAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</div>
+      </div>
+      <button onclick="shareTake('${t.id}')" title="Share / AirDrop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button>
+      <button class="t-del" onclick="delTake('${t.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+    </div>`).join('');
+}
+async function shareTake(id) {
+  const t = (await dbAll()).find(x => x.id === id);
+  if (!t) return;
+  const file = new File([t.blob], t.name, { type: t.blob.type || 'video/mp4' });
+  if (navigator.canShare && navigator.canShare({ files:[file] })) {
+    try { await navigator.share({ files:[file] }); return; } catch(e) { if (e.name === 'AbortError') return; }
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(t.blob); a.download = t.name;
+  document.body.appendChild(a); a.click(); a.remove();
+  toast('Downloading ' + t.name);
+}
+async function delTake(id) {
+  if (!confirm('Delete this take?')) return;
+  await dbDel(id); renderTakes();
+}
+
+// ── camera ──
+let stream = null, rec = null, chunks = [], recStart = 0, timerH = null;
+let camStroke = null, facing = 'environment', takeNo = 1;
+
+async function openCam(strokeId) {
+  camStroke = strokeId;
+  takeNo = 1;
+  document.getElementById('camStrokeName').textContent = NAME[strokeId] || strokeId;
+  document.getElementById('home').classList.remove('on');
+  document.getElementById('cam').classList.add('on');
+  updateCount();
+  await startStream();
+}
+async function startStream() {
+  stopStream();
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: facing }, width: { ideal: 1920 }, height: { ideal: 1080 }, frameRate: { ideal: 60 } },
+      audio: true,
+    });
+    document.getElementById('preview').srcObject = stream;
+  } catch (e) {
+    toast('Camera blocked: ' + e.message);
+    closeCam();
+  }
+}
+function stopStream() {
+  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+}
+function flipCam() {
+  if (rec) return toast('Stop recording first');
+  facing = facing === 'environment' ? 'user' : 'environment';
+  startStream();
+}
+function closeCam() {
+  if (rec) toggleRec();
+  stopStream();
+  document.getElementById('cam').classList.remove('on');
+  document.getElementById('home').classList.add('on');
+  renderTakes();
+}
+function updateCount() { document.getElementById('camCount').textContent = 'take ' + takeNo; }
+
+function pickMime() {
+  const opts = ['video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm'];
+  for (const m of opts) if (window.MediaRecorder && MediaRecorder.isTypeSupported(m)) return m;
+  return '';
+}
+function toggleRec() {
+  if (!stream) return;
+  const btn = document.getElementById('recBtn');
+  const timer = document.getElementById('camTimer');
+  if (!rec) {
+    chunks = [];
+    const mime = pickMime();
+    try { rec = new MediaRecorder(stream, mime ? { mimeType: mime, videoBitsPerSecond: 12_000_000 } : undefined); }
+    catch (e) { toast('Recording not supported: ' + e.message); return; }
+    rec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+    rec.onstop = saveTake;
+    rec.start(1000);
+    recStart = Date.now();
+    btn.classList.add('rec');
+    timer.classList.add('rec');
+    timerH = setInterval(() => { timer.textContent = fmtDur((Date.now() - recStart) / 1000); }, 250);
+  } else {
+    rec.stop();
+    rec = null;
+    btn.classList.remove('rec');
+    timer.classList.remove('rec');
+    clearInterval(timerH);
+    timer.textContent = '0:00';
+  }
+}
+async function saveTake() {
+  if (!chunks.length) return;
+  const type = chunks[0].type || 'video/mp4';
+  const blob = new Blob(chunks, { type });
+  chunks = [];
+  const ext = type.includes('mp4') ? 'mp4' : 'webm';
+  const now = new Date();
+  const name = `replay~${camStroke}~${stamp(now)}~${takeNo}.${ext}`;
+  const dur = (Date.now() - recStart) / 1000;
+  await dbPut({ id: Date.now().toString(36) + Math.random().toString(36).slice(2),
+                strokeId: camStroke, name, blob, size: blob.size, dur, createdAt: now.getTime() });
+  takeNo++;
+  updateCount();
+  toast(`Saved · ${NAME[camStroke]} take ${takeNo - 1} (${fmtDur(dur)})`);
+}
+
+// keep screen awake while camera screen is open (iOS 16.4+)
+let wake = null;
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState === 'visible' && document.getElementById('cam').classList.contains('on')) {
+    try { wake = await navigator.wakeLock.request('screen'); } catch (e) {}
+  }
+});
+
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+renderHome();
+</script>
+</body>
+</html>
