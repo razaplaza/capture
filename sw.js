@@ -1,5 +1,5 @@
-// minimal offline cache so Replay Capture opens with no signal at the club
-const CACHE = 'replay-capture-v1';
+// offline cache so Smæsh opens and records with no signal at the club
+const CACHE = 'smaesh-capture-v2';
 const ASSETS = ['./capture.html', './manifest.webmanifest', './icon-180.png'];
 
 self.addEventListener('install', e => {

@@ -3,243 +3,212 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
-<title>Replay Capture</title>
+<title>Smæsh</title>
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="theme-color" content="#0a0a0c" />
+<meta name="theme-color" content="#11161c" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="icon-180.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --ink-000:#0a0a0c; --ink-050:#101013; --ink-100:#15161a;
-    --ink-200:#1c1d23; --ink-300:#25272f; --ink-400:#31343e;
-    --ivory-100:#f4efe6; --ivory-300:#b9b2a4; --ivory-400:#8a8578; --ivory-500:#5f5b53;
-    --ball:#ff7a1a; --ball-soft:#ff8f3a; --ball-deep:#e86200;
-    --ball-glow:rgba(255,122,26,0.18);
-    --green:#5cd99a; --red:#ff5a5a; --blue:#6aa9ff;
-    --r:10px; --r-lg:14px;
-    --sans:'Inter',system-ui,sans-serif; --display:'Fraunces',Georgia,serif; --mono:'JetBrains Mono',monospace;
-    --safe-top:env(safe-area-inset-top, 0px); --safe-bot:env(safe-area-inset-bottom, 0px);
+    --ink:#e8eef2; --mute:#7d8a96; --line:#243039; --card:#1a222b; --edge:#2a3642;
+    --teal:#3fd2c7; --teal-d:#2fb8ad; --gain:#4ee39a; --rec:#ff5a4f; --warn:#ffb547; --danger:#ff6b6b;
+    --ui:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif; --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+    --st:env(safe-area-inset-top, 0px); --sb:env(safe-area-inset-bottom, 0px);
   }
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  html,body { height:100%; }
-  body {
-    font-family:var(--sans); background:var(--ink-000); color:var(--ivory-100);
-    font-size:15px; line-height:1.5; overflow:hidden; user-select:none; -webkit-user-select:none;
-    -webkit-font-smoothing:antialiased;
-  }
-  button { font-family:var(--sans); border:none; background:none; color:inherit; cursor:pointer; }
+  [hidden] { display:none !important; }
+  html, body { height:100%; }
+  body { font-family:var(--ui); color:var(--ink); font-size:15px; overflow:hidden; -webkit-font-smoothing:antialiased;
+         background:radial-gradient(120% 60% at 50% 0%, #1b2530 0%, #11161c 55%, #0d1116 100%) fixed, #0d1116;
+         user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; }
+  button { font:inherit; color:inherit; border:0; background:none; cursor:pointer; }
+  input { font:inherit; }
+  svg { width:22px; height:22px; flex-shrink:0; }
+  .app { position:fixed; inset:0; display:flex; flex-direction:column; }
+  .top { padding:calc(var(--st) + 14px) 20px 6px; display:flex; align-items:center; gap:10px; flex-shrink:0; }
+  .top .word { font-weight:700; font-size:28px; letter-spacing:-.02em; }
+  .top .tact { margin-left:auto; display:flex; gap:8px; }
+  .iconbtn { width:42px; height:42px; border-radius:12px; background:var(--card); border:1px solid var(--edge); display:grid; place-items:center; position:relative; }
+  .iconbtn input { position:absolute; inset:0; opacity:0; }
+  .body { flex:1; min-height:0; overflow-y:auto; padding:10px 18px 20px; display:flex; flex-direction:column; gap:14px; -webkit-overflow-scrolling:touch; }
+  .lab { font-size:11.5px; font-weight:700; letter-spacing:.08em; color:var(--mute); }
+  .tabs { flex-shrink:0; background:#131a21; border-top:1px solid var(--line); display:grid; grid-template-columns:repeat(3,1fr);
+          align-items:center; padding:8px 0 calc(var(--sb) + 8px); }
+  .tab { display:flex; flex-direction:column; align-items:center; gap:4px; font-size:11px; color:var(--mute); position:relative; }
+  .tab.on { color:var(--teal); }
+  .tab .dot { position:absolute; top:-3px; right:calc(50% - 18px); min-width:17px; height:17px; border-radius:9px; background:var(--warn); color:#1a1200;
+              font-size:10px; font-weight:800; display:grid; place-items:center; padding:0 4px; }
+  .tab.mid { margin-top:-30px; touch-action:none; }
+  .tab.mid i { width:66px; height:66px; border-radius:50%; background:radial-gradient(circle at 40% 30%, #56e3d8, #2aa99f); display:grid; place-items:center;
+               box-shadow:0 0 0 6px #131a21, 0 8px 24px rgba(63,210,199,.35); transition:transform .15s; }
+  .tab.mid i::after { content:''; width:24px; height:24px; border-radius:50%; background:var(--rec); box-shadow:0 0 0 3px #062825; }
+  .tab.mid.on i { box-shadow:0 0 0 6px #131a21, 0 0 0 8px var(--teal), 0 8px 24px rgba(63,210,199,.35); }
+  .tab.mid:active i { transform:scale(.94); }
 
-  .screen { position:fixed; inset:0; display:none; flex-direction:column; }
-  .screen.on { display:flex; }
+  /* record: big tiles that expand */
+  .banner { display:flex; align-items:center; gap:12px; background:linear-gradient(90deg,#1f2a35,#1a232d); border:1px solid var(--teal); border-radius:14px; padding:12px 14px; }
+  .banner b { flex:1; font-size:14.5px; } .banner button { color:var(--mute); font-weight:600; font-size:13px; }
+  .cats { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:10px; }
+  .cat { display:flex; align-items:center; gap:12px; padding:18px 15px; border-radius:18px; background:var(--card); border:1px solid var(--edge);
+         font-weight:600; font-size:16px; min-width:0; text-align:left; }
+  .cat svg { width:34px; height:34px; color:var(--teal); stroke-width:1.6; }
+  .cat .n { margin-left:auto; font-family:var(--mono); font-size:12px; color:var(--mute); font-weight:500; }
+  .cat.on { border-color:var(--teal); background:rgba(63,210,199,.1); }
+  .drawer { grid-column:1/-1; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; padding:12px; border-radius:14px;
+            background:#141b22; border:1px solid var(--edge); animation:open .18s ease-out; min-width:0; }
+  @keyframes open { from { opacity:0; transform:translateY(-4px); } }
+  .opt { border:1px solid var(--edge); background:var(--card); border-radius:11px; padding:13px 6px; font-weight:600; font-size:14.5px; text-align:center; line-height:1.2; }
+  .opt:active { border-color:var(--teal); color:var(--teal); }
+  .opt.hold { border-color:var(--teal); transform:scale(.96); transition:transform .3s; }
+  .opt.add { border:1px dashed var(--teal); background:rgba(63,210,199,.06); color:var(--teal); font-size:22px; font-weight:500; line-height:1; }
+  .new { border:1px solid var(--teal); background:#0d1116; color:var(--ink); border-radius:11px; padding:10px 8px; font-size:15px; font-weight:600;
+         min-width:0; outline:none; text-align:center; user-select:text; -webkit-user-select:text; }
+  .quick { display:flex; flex-wrap:wrap; gap:8px; }
+  .quick .opt { padding:10px 14px; }
 
-  /* ============ HOME ============ */
-  #home { padding:calc(var(--safe-top) + 18px) 18px calc(var(--safe-bot) + 18px); overflow-y:auto; display:none; }
-  #home.on { display:block; }
-  .brand { display:flex; align-items:center; gap:10px; margin-bottom:4px; }
-  .brand .dot {
-    width:22px; height:22px; border-radius:50%;
-    background:radial-gradient(circle at 35% 30%, #fff, var(--ball-soft) 55%, var(--ball-deep));
-    box-shadow:0 0 14px var(--ball-glow), inset 0 -2px 5px rgba(0,0,0,0.25);
-  }
-  .brand .name { font-family:var(--display); font-size:22px; font-weight:500; }
-  .sub { font-size:12.5px; color:var(--ivory-400); margin-bottom:18px; }
+  /* library */
+  .seg { display:grid; grid-auto-flow:column; grid-auto-columns:1fr; background:#1a222b; border:1px solid var(--edge); border-radius:12px; padding:3px; flex-shrink:0; }
+  .seg button { padding:9px 0; font-size:12px; font-weight:700; letter-spacing:.05em; color:var(--mute); border-radius:9px; }
+  .seg button.on { background:linear-gradient(90deg,var(--teal-d),var(--teal)); color:#062825; }
+  .chips { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:5px; flex-shrink:0; }
+  .chip { border:1px solid var(--edge); background:var(--card); border-radius:999px; padding:8px 0; font-size:12.5px; font-weight:600; color:var(--mute); }
+  .chip.on { background:var(--teal); color:#062825; border-color:var(--teal); }
+  .up { display:flex; align-items:center; gap:12px; background:linear-gradient(90deg,#1f2a35,#1a232d); border:1px solid var(--edge); border-radius:14px; padding:11px 12px; flex-shrink:0; }
+  .up .bi { width:36px; height:36px; border-radius:10px; background:#11161c; display:grid; place-items:center; color:var(--teal); }
+  .up b { font-size:14.5px; } .up .go { margin-left:auto; background:var(--teal); color:#062825; font-weight:700; border-radius:10px; padding:10px 14px; font-size:13.5px; }
+  .ghead { display:flex; align-items:baseline; gap:8px; } .ghead b { font-size:15px; } .ghead span { font-family:var(--mono); font-size:11.5px; color:var(--mute); }
+  .g3 { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
+  .thumb { position:relative; border-radius:12px; overflow:hidden; aspect-ratio:3/4; background:#1c2530 center/cover no-repeat; text-align:left; }
+  .thumb.wide { aspect-ratio:16/10; width:128px; flex-shrink:0; }
+  .thumb .d { position:absolute; left:6px; bottom:6px; font-family:var(--mono); font-size:10.5px; padding:1px 6px; border-radius:5px; background:rgba(0,0,0,.6); }
+  .thumb .k { position:absolute; left:6px; top:6px; right:32px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:10.5px; font-weight:700;
+              padding:2px 7px; border-radius:6px; background:rgba(13,17,22,.8); }
+  .sync { position:absolute; right:6px; top:6px; width:21px; height:21px; border-radius:50%; display:grid; place-items:center; background:rgba(13,17,22,.8); }
+  .sync svg { width:12px; height:12px; } .sync.local { color:var(--mute); } .sync.sent { color:var(--gain); }
+  .thumb.sel { outline:3px solid var(--teal); outline-offset:-3px; }
+  .thumb .tick { position:absolute; right:6px; top:6px; width:22px; height:22px; border-radius:50%; background:var(--teal); color:#062825; display:grid; place-items:center; font-weight:800; font-size:12px; }
+  .thumb .tick.off { background:rgba(13,17,22,.8); border:2px solid var(--mute); }
+  .mcard { display:flex; align-items:center; gap:14px; padding:10px; border-radius:16px; background:var(--card); border:1px solid var(--edge); }
+  .mcard .mt b { display:block; font-size:16px; } .mcard .mt span { display:block; margin-top:3px; font-size:12.5px; color:var(--mute); }
+  .actionbar { flex-shrink:0; display:flex; gap:8px; padding:12px 16px calc(var(--sb) + 12px); background:#131a21; border-top:1px solid var(--line); }
+  .actionbar button { flex:1; border:1px solid var(--edge); background:var(--card); border-radius:12px; padding:13px 8px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:7px; }
+  .actionbar .primary { background:var(--teal); color:#062825; border-color:var(--teal); }
+  .actionbar .danger { color:var(--danger); } .actionbar .danger.sure { background:var(--danger); color:#1a0505; border-color:var(--danger); }
+  .actionbar svg { width:18px; height:18px; }
+  .empty { margin:auto; text-align:center; color:var(--mute); display:flex; flex-direction:column; align-items:center; gap:12px; }
+  .empty svg { width:42px; height:42px; color:var(--edge); }
+  .empty button { background:var(--teal); color:#062825; font-weight:700; border-radius:12px; padding:12px 18px; }
 
-  .match-btn {
-    width:100%; display:flex; align-items:center; gap:12px; padding:16px;
-    background:linear-gradient(180deg, rgba(255,122,26,0.10), rgba(255,122,26,0.04));
-    border:1px solid rgba(255,122,26,0.4); border-radius:var(--r-lg);
-    font-size:16px; font-weight:600; color:var(--ball-soft); margin-bottom:20px;
-  }
-  .match-btn:active { background:rgba(255,122,26,0.18); }
-  .match-btn svg { width:22px; height:22px; }
-  .match-btn .m-sub { display:block; font-size:11.5px; font-weight:400; color:var(--ivory-400); }
+  /* settings */
+  .card { background:var(--card); border:1px solid var(--edge); border-radius:16px; padding:16px; display:flex; flex-direction:column; gap:10px; }
+  .card h3 { font-size:16px; } .card p { color:var(--mute); line-height:1.5; font-size:14px; }
+  .card ol { padding-left:20px; color:var(--mute); line-height:1.6; font-size:14px; display:flex; flex-direction:column; gap:4px; }
+  .card ol b { color:var(--ink); font-weight:600; }
+  .stat { display:flex; justify-content:space-between; font-size:14px; } .stat span { color:var(--mute); } .stat b { font-family:var(--mono); font-weight:500; }
+  .wide-btn { border:1px solid var(--edge); background:#141b22; border-radius:12px; padding:13px; font-weight:700; }
+  .wide-btn.danger { color:var(--danger); } .wide-btn.sure { background:var(--danger); color:#1a0505; border-color:var(--danger); }
 
-  .pillar-title {
-    font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
-    color:var(--ivory-500); margin:16px 0 8px 2px;
-  }
-  .stroke-grid { display:grid; grid-template-columns:1fr 1fr; gap:9px; }
-  .stroke-btn {
-    padding:15px 12px; background:var(--ink-100); border:1px solid var(--ink-300);
-    border-radius:var(--r); font-size:15px; font-weight:600; color:var(--ivory-100); text-align:left;
-  }
-  .stroke-btn:active { background:var(--ink-200); border-color:var(--ink-400); }
-  .stroke-btn .n { display:block; font-family:var(--mono); font-size:10px; font-weight:400; color:var(--ivory-500); margin-top:2px; }
+  /* camera */
+  .cam { position:fixed; inset:0; z-index:20; background:#000; display:flex; flex-direction:column; touch-action:none; }
+  .cam video.live, .cam video.loop { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .ctop { position:relative; z-index:2; padding:calc(var(--st) + 12px) 14px 30px; display:flex; align-items:center; gap:8px;
+          background:linear-gradient(rgba(0,0,0,.5), transparent); }
+  .pill { border-radius:10px; background:rgba(17,22,28,.8); border:1px solid var(--edge); font-size:14px; font-weight:600; padding:7px 12px; }
+  .pill.label { background:linear-gradient(90deg,var(--teal-d),var(--teal)); color:#062825; border-color:transparent; }
+  .timer { margin-left:auto; font-family:var(--mono); font-size:16px; color:var(--ink); background:rgba(17,22,28,.85); border:1px solid var(--edge); padding:6px 11px; border-radius:10px; }
+  .timer.rec { color:var(--gain); } .timer.rec::before { content:''; display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--rec); margin-right:7px; vertical-align:middle; }
+  .cbtn { width:42px; height:42px; border-radius:12px; background:rgba(17,22,28,.8); border:1px solid var(--edge); display:grid; place-items:center; color:var(--ink); }
+  .opts { position:relative; z-index:2; margin-top:auto; display:flex; justify-content:center; gap:7px; flex-wrap:wrap; padding:0 12px 16px; }
+  .ochip { border-radius:10px; background:rgba(17,22,28,.8); border:1px solid var(--edge); color:var(--teal); font-family:var(--mono); font-size:12.5px; padding:7px 11px; }
+  .ochip span { color:var(--mute); margin-right:5px; }
+  .cbot { position:relative; z-index:2; display:flex; align-items:center; justify-content:center; gap:46px; padding:4px 0 calc(var(--sb) + 26px);
+          background:linear-gradient(transparent, rgba(0,0,0,.55) 40%); }
+  .shut { width:84px; height:84px; border-radius:50%; border:4px solid var(--teal); display:grid; place-items:center; box-shadow:0 0 24px rgba(63,210,199,.35); }
+  .shut i { width:62px; height:62px; border-radius:50%; background:var(--rec); transition:all .15s; }
+  .shut.on i { width:30px; height:30px; border-radius:8px; }
+  .side { width:48px; height:48px; border-radius:14px; background:rgba(17,22,28,.8) center/cover no-repeat; border:1px solid var(--edge); color:var(--teal);
+          font-size:13px; font-weight:700; display:grid; place-items:center; }
+  /* quick camera */
+  .ring { position:relative; width:96px; height:96px; touch-action:none; }
+  .ring svg { position:absolute; inset:0; width:96px; height:96px; transform:rotate(-90deg); }
+  .ring .bg { fill:none; stroke:rgba(255,255,255,.9); stroke-width:6; }
+  .ring .fg { fill:none; stroke:var(--rec); stroke-width:6; stroke-linecap:round; stroke-dasharray:283; stroke-dashoffset:283; }
+  .ring i { position:absolute; inset:14px; border-radius:50%; background:rgba(255,255,255,.18); transition:transform .15s, background .15s; }
+  .ring.on i { background:var(--rec); transform:scale(.72); }
+  .qtip { position:relative; z-index:2; align-self:center; margin:auto 0 14px; font-size:13px; font-weight:600; background:rgba(0,0,0,.45); padding:6px 12px; border-radius:999px; }
+  .pbar { position:relative; z-index:2; margin-top:auto; display:flex; gap:10px; padding:0 16px calc(var(--sb) + 22px); }
+  .pbar button { border-radius:999px; height:56px; font-weight:700; font-size:16px; display:flex; align-items:center; justify-content:center; gap:8px; }
+  .pbar .save { background:rgba(0,0,0,.55); color:#fff; padding:0 22px; border:1px solid rgba(255,255,255,.2); }
+  .pbar .save.done { color:var(--gain); }
+  .pbar .send { flex:1; background:var(--teal); color:#062825; }
+  .pbar svg { width:20px; height:20px; }
+  .xbtn { width:42px; height:42px; border-radius:50%; background:rgba(0,0,0,.45); color:#fff; font-size:24px; line-height:1; display:grid; place-items:center; }
 
-  /* takes */
-  .takes-head { display:flex; align-items:baseline; gap:10px; margin:26px 0 10px 2px; }
-  .takes-head h2 { font-family:var(--display); font-size:18px; font-weight:500; }
-  .takes-head .k { font-family:var(--mono); font-size:11px; color:var(--ivory-500); }
-  .take {
-    display:flex; align-items:center; gap:11px; padding:11px 12px; margin-bottom:8px;
-    background:var(--ink-100); border:1px solid var(--ink-200); border-radius:var(--r);
-  }
-  .take .t-dot { width:9px; height:9px; border-radius:50%; background:var(--ball); flex-shrink:0; }
-  .take .t-info { flex:1; min-width:0; }
-  .take .t-name { font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .take .t-meta { font-family:var(--mono); font-size:10.5px; color:var(--ivory-500); }
-  .take button { padding:9px; border-radius:8px; background:var(--ink-200); color:var(--ivory-300); flex-shrink:0; }
-  .take button:active { background:var(--ink-300); }
-  .take button svg { width:16px; height:16px; display:block; }
-  .take .t-del { color:var(--ivory-500); }
-  .take .t-del:active { color:var(--red); }
-  .export-all {
-    width:100%; padding:14px; margin-top:4px; border-radius:var(--r);
-    background:rgba(106,169,255,0.12); border:1px solid rgba(106,169,255,0.4);
-    color:var(--blue); font-size:14.5px; font-weight:600;
-  }
-  .export-all:active { background:rgba(106,169,255,0.2); }
-  .takes-empty { padding:22px; text-align:center; color:var(--ivory-500); font-size:13px; border:1.5px dashed var(--ink-300); border-radius:var(--r-lg); }
-  .hint { margin-top:14px; font-size:11.5px; color:var(--ivory-500); line-height:1.7; }
-  .hint b { color:var(--ivory-400); }
-
-  /* ============ CAMERA ============ */
-  #cam { background:#000; }
-  #cam video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-  .cam-top {
-    position:absolute; top:0; left:0; right:0; z-index:5;
-    padding:calc(var(--safe-top) + 12px) 16px 30px;
-    display:flex; align-items:center; gap:10px;
-    background:linear-gradient(180deg, rgba(0,0,0,0.55), transparent);
-  }
-  .cam-back { padding:8px 10px; border-radius:9px; background:rgba(10,10,12,0.55); color:var(--ivory-100); backdrop-filter:blur(6px); }
-  .cam-back svg { width:18px; height:18px; display:block; }
-  .cam-stroke {
-    display:inline-flex; align-items:center; gap:8px; padding:7px 14px; border-radius:999px;
-    background:rgba(10,10,12,0.55); border:1px solid rgba(255,122,26,0.5); backdrop-filter:blur(6px);
-    font-size:14px; font-weight:600;
-  }
-  .cam-stroke .cd { width:8px; height:8px; border-radius:50%; background:var(--ball); }
-  .cam-timer {
-    margin-left:auto; font-family:var(--mono); font-size:15px; padding:7px 12px; border-radius:9px;
-    background:rgba(10,10,12,0.55); backdrop-filter:blur(6px); color:var(--ivory-300);
-  }
-  .cam-timer.rec { color:#fff; background:rgba(255,60,60,0.7); }
-  .cam-bottom {
-    position:absolute; bottom:0; left:0; right:0; z-index:5;
-    padding:26px 0 calc(var(--safe-bot) + 26px);
-    display:flex; align-items:center; justify-content:center; gap:38px;
-    background:linear-gradient(0deg, rgba(0,0,0,0.55), transparent);
-  }
-  .rec-btn {
-    width:76px; height:76px; border-radius:50%; border:4px solid rgba(255,255,255,0.85);
-    display:flex; align-items:center; justify-content:center; background:transparent;
-  }
-  .rec-btn .core { width:58px; height:58px; border-radius:50%; background:var(--red); transition:all .18s; }
-  .rec-btn.rec .core { width:30px; height:30px; border-radius:8px; }
-  .cam-count {
-    position:absolute; left:24px; bottom:calc(var(--safe-bot) + 44px); z-index:5;
-    font-family:var(--mono); font-size:12px; color:var(--ivory-300);
-    background:rgba(10,10,12,0.55); padding:6px 11px; border-radius:999px; backdrop-filter:blur(6px);
-  }
-  .cam-flip { position:absolute; right:24px; bottom:calc(var(--safe-bot) + 40px); z-index:5;
-    padding:12px; border-radius:50%; background:rgba(10,10,12,0.55); backdrop-filter:blur(6px); color:var(--ivory-100); }
-  .cam-flip svg { width:20px; height:20px; display:block; }
-
-  .cam-opts {
-    position:absolute; left:0; right:0; bottom:calc(var(--safe-bot) + 118px); z-index:5;
-    display:flex; justify-content:center; gap:8px; flex-wrap:wrap; padding:0 14px;
-  }
-  .opt-chip {
-    padding:7px 13px; border-radius:999px; font-size:12.5px; font-weight:600;
-    background:rgba(10,10,12,0.55); border:1px solid rgba(255,255,255,0.18);
-    color:var(--ivory-100); backdrop-filter:blur(6px);
-  }
-  .opt-chip:active { background:rgba(255,122,26,0.3); }
-  .opt-chip .k { color:var(--ivory-400); font-weight:400; margin-right:4px; font-size:10.5px; }
-
-  .import-btn {
-    width:100%; display:flex; align-items:center; gap:12px; padding:13px 16px; margin-bottom:6px;
-    background:var(--ink-100); border:1px solid var(--ink-300); border-radius:var(--r-lg);
-    font-size:14.5px; font-weight:600; color:var(--ivory-300); text-align:left;
-  }
-  .import-btn:active { background:var(--ink-200); }
-  .import-btn svg { width:20px; height:20px; flex-shrink:0; }
-  .import-btn .m-sub { display:block; font-size:11px; font-weight:400; color:var(--ivory-500); }
-  body.importing .stroke-btn { border-color:rgba(106,169,255,0.5); }
-  .import-banner {
-    display:none; padding:10px 14px; margin-bottom:12px; border-radius:var(--r);
-    background:rgba(106,169,255,0.12); border:1px solid rgba(106,169,255,0.4);
-    color:var(--blue); font-size:13px; font-weight:600;
-  }
-  body.importing .import-banner { display:block; }
-
-  .toast {
-    position:fixed; left:50%; bottom:calc(var(--safe-bot) + 20px); transform:translateX(-50%) translateY(20px);
-    background:var(--ink-100); border:1px solid var(--ink-400); color:var(--ivory-100);
-    padding:10px 18px; border-radius:999px; font-size:13.5px; z-index:99; opacity:0;
-    transition:all .22s; pointer-events:none; white-space:nowrap;
-  }
-  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  /* player + sheets */
+  .player { position:fixed; inset:0; z-index:30; background:#000; display:flex; flex-direction:column; }
+  .player video { flex:1; min-height:0; width:100%; object-fit:contain; background:#000; }
+  .player .ctop { background:none; }
+  .player .pbar { margin-top:0; padding-top:12px; }
+  .menu { position:fixed; inset:0; z-index:40; background:rgba(5,8,10,.55); display:flex; flex-direction:column; justify-content:flex-end; }
+  .sheet { background:#141b22; border-top:1px solid var(--edge); border-radius:22px 22px 0 0; padding:14px 18px calc(var(--sb) + 22px); display:flex; flex-direction:column; gap:10px; animation:up .2s ease-out; }
+  @keyframes up { from { transform:translateY(30px); opacity:0; } }
+  .sheet .grab { width:40px; height:4px; border-radius:2px; background:var(--edge); align-self:center; }
+  .mh { font-size:18px; font-weight:700; text-align:center; padding:4px 0 6px; }
+  .act { display:flex; align-items:center; justify-content:center; border:1px solid var(--edge); background:var(--card); border-radius:14px; padding:15px; font-size:16px; font-weight:600; }
+  .act.danger { color:var(--danger); } .act.primary { background:var(--teal); color:#062825; border-color:var(--teal); } .act.plain { background:none; border-color:transparent; color:var(--mute); }
+  .menu input { background:#0d1116; border:1px solid var(--teal); border-radius:14px; padding:15px; color:var(--ink); font-size:17px; font-weight:600; outline:none; text-align:center;
+                user-select:text; -webkit-user-select:text; }
+  .toast { position:fixed; left:50%; top:calc(var(--st) + 70px); transform:translateX(-50%); z-index:60; background:var(--ink); color:#0d1116; font-weight:600;
+           font-size:14px; padding:10px 17px; border-radius:999px; white-space:nowrap; max-width:92vw; overflow:hidden; text-overflow:ellipsis; pointer-events:none; }
+  @media (prefers-reduced-motion: reduce) { * { animation:none !important; transition:none !important; } }
 </style>
 </head>
 <body>
-
-<!-- ============ HOME ============ -->
-<div class="screen on" id="home">
-  <div class="brand"><span class="dot"></span><span class="name">Replay Capture</span></div>
-  <div class="sub">Pick what you're filming — takes are named so your PC files them automatically.</div>
-
-  <button class="match-btn" onclick="pickTarget('match')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><line x1="12" y1="6" x2="12" y2="18"/></svg>
-    <span>Record a match<span class="m-sub">full game — serves get detected later</span></span>
-  </button>
-
-  <div class="import-banner">Importing from Photos — now tap the stroke this video shows (or Match). Tap again to cancel.</div>
-  <button class="import-btn" onclick="toggleImport()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
-    <span>Label a video from Photos<span class="m-sub">for takes filmed in the native Camera app (Cinematic, 4K…)</span></span>
-  </button>
-  <input type="file" id="importPick" accept="video/*" style="display:none" onchange="onImportPick(event)" />
-
-  <div id="strokes"></div>
-
-  <div class="takes-head"><h2>Takes on this phone</h2><span class="k" id="takeCount"></span></div>
-  <div id="takeList"></div>
-
-  <div class="hint">
-    <b>Getting takes to your PC:</b> tap ⇪ on a take → AirDrop / Save to Files / Drive — any route works.
-    Keep the filename. Desktop Replay reads it and files the video into the right stroke with the right date automatically.
-  </div>
-</div>
-
-<!-- ============ CAMERA ============ -->
-<div class="screen" id="cam">
-  <video id="preview" autoplay playsinline muted></video>
-  <div class="cam-top">
-    <button class="cam-back" onclick="closeCam()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-    <span class="cam-stroke"><span class="cd"></span><span id="camStrokeName"></span></span>
-    <span class="cam-timer" id="camTimer">0:00</span>
-  </div>
-  <span class="cam-count" id="camCount"></span>
-  <button class="cam-flip" onclick="flipCam()" title="Flip camera">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 19H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5"/><path d="M13 5h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-5"/><circle cx="12" cy="12" r="3"/></svg>
-  </button>
-  <div class="cam-opts" id="camOpts"></div>
-  <div class="cam-bottom">
-    <button class="rec-btn" id="recBtn" onclick="toggleRec()"><span class="core"></span></button>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
+<div class="app" id="app"></div>
+<div id="layer"></div>
+<input type="file" id="importPick" accept="video/*" hidden />
 
 <script>
 'use strict';
-// same stroke tree as desktop Replay — ids must match for auto-filing
-const TREE = {
-  forehand: { name:'Forehand', strokes:[['fh_loop','Loop'],['fh_flick','Flick'],['fh_push','Push'],['fh_drive','Drive']] },
-  backhand: { name:'Backhand', strokes:[['bh_loop','Loop'],['bh_flick','Flick'],['bh_push','Push'],['bh_block','Block']] },
-  serve:    { name:'Serve',    strokes:[['sv_pendulum','Pendulum'],['sv_tomahawk','Tomahawk'],['sv_backspin','Backspin'],['sv_backhand','Backhand serve']] },
-  receive:  { name:'Receive',  strokes:[['rc_flick','Flick'],['rc_push','Push'],['rc_banana','Banana']] },
-};
-const NAME = { match:'Match' };
-Object.values(TREE).forEach(p => p.strokes.forEach(([id, n]) => NAME[id] = p.name + ' ' + n));
+/* ═════════ taxonomy ═════════
+   ids must match desktop Smæsh so takes file themselves there:
+   fh_ / bh_ / sv_ / rc_ strokes, dr_ drills, "match", "quick"            */
+const CAT_DEF = [
+  ['fh','Forehand',[['fh_loop','Loop'],['fh_flick','Flick'],['fh_push','Push'],['fh_drive','Drive'],['fh_block','Block'],['fh_smash','Smash']]],
+  ['bh','Backhand',[['bh_loop','Loop'],['bh_flick','Flick'],['bh_push','Push'],['bh_block','Block'],['bh_drive','Drive']]],
+  ['sv','Serve',[['sv_pendulum','Pendulum'],['sv_reverse_pendulum','Reverse pendulum'],['sv_tomahawk','Tomahawk'],['sv_backspin','Backspin'],['sv_backhand','Backhand serve']]],
+  ['rc','Receive',[['rc_flick','Flick'],['rc_push','Push'],['rc_banana','Banana'],['rc_short_touch','Short touch']]],
+  ['match','Match',[['match','Tournament'],['match','League'],['match','Practice match']]],
+  ['dr','Drills',[['dr_footwork','Footwork'],['dr_multiball','Multiball'],['dr_falkenberg','Falkenberg'],['dr_random','Random']]],
+];
+let CATS;
+try { CATS = JSON.parse(localStorage.getItem('smaesh_cats') || 'null'); } catch (e) {}
+if (!Array.isArray(CATS)) CATS = JSON.parse(JSON.stringify(CAT_DEF));
+const saveCats = () => { try { localStorage.setItem('smaesh_cats', JSON.stringify(CATS)); } catch (e) {} };
+const SHORT = { fh:'FH', bh:'BH', sv:'SV', rc:'RC', match:'MATCH', dr:'DRILL', quick:'QUICK' };
+const STROKE = ['fh','bh','sv','rc'];
+const cat = k => CATS.find(c => c[0] === k);
+const slug = s => s.toLowerCase().replace(/æ/g,'ae').replace(/ø/g,'o').replace(/å/g,'a').normalize('NFD').replace(/[̀-ͯ]/g,'')
+                   .replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'').slice(0, 30) || 'stroke';
+const idFor = (c, name) => c === 'match' ? 'match' : c + '_' + slug(name);
+function catOfId(id) {
+  if (!id) return 'fh';
+  if (id === 'match') return 'match';
+  if (id === 'quick') return 'quick';
+  const p = id.slice(0, 2);
+  return p === 'dr' ? 'dr' : STROKE.includes(p) ? p : 'fh';
+}
+function labelOf(t) {
+  if (t.label) return t.label;
+  const c = cat(t.cat); const hit = c && c[2].find(x => x[0] === t.strokeId);
+  return hit ? hit[1] : (t.strokeId || '').replace(/^[a-z]{2}_/, '').replace(/_/g, ' ').replace(/^./, m => m.toUpperCase());
+}
 
-// ── IndexedDB take store ──
+/* ═════════ storage: IndexedDB takes (same store the old capture app used) ═════════ */
 let _db = null;
 function db() {
   if (_db) return Promise.resolve(_db);
@@ -250,249 +219,545 @@ function db() {
     rq.onerror = e => rej(e.target.error);
   });
 }
-async function dbAll() {
-  const d = await db();
-  return new Promise(res => {
-    const rq = d.transaction('takes').objectStore('takes').getAll();
-    rq.onsuccess = () => res(rq.result || []);
-  });
-}
+async function dbAll() { const d = await db(); return new Promise(res => { const rq = d.transaction('takes').objectStore('takes').getAll(); rq.onsuccess = () => res(rq.result || []); }); }
 async function dbPut(t) { const d = await db(); return new Promise(res => { const tx = d.transaction('takes','readwrite'); tx.objectStore('takes').put(t); tx.oncomplete = res; }); }
 async function dbDel(id) { const d = await db(); return new Promise(res => { const tx = d.transaction('takes','readwrite'); tx.objectStore('takes').delete(id); tx.oncomplete = res; }); }
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2);
+try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
 
+/* ═════════ state ═════════ */
+const S = {
+  tab:'record', takes:[], open:null, adding:null, menu:null, importFile:null,
+  sec:'strokes', filter:'all', sel:null, delSure:false,
+  recent: (() => { try { return JSON.parse(localStorage.getItem('smaesh_recent') || '[]'); } catch (e) { return []; } })(),
+  cam:null, quick:null, player:null, clearSure:false,
+};
+const saveRecent = () => { try { localStorage.setItem('smaesh_recent', JSON.stringify(S.recent.slice(0, 4))); } catch (e) {} };
+const unsent = () => S.takes.filter(t => t.sync !== 'sent');
+
+/* ═════════ helpers ═════════ */
+const I = {
+  fh:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="9.5" cy="9.5" rx="6.5" ry="7" fill="currentColor" fill-opacity=".22"/><path d="M14 15l5.5 5.5" stroke-width="3.4"/></svg>',
+  bh:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="14.5" cy="9.5" rx="6.5" ry="7" fill="currentColor" fill-opacity=".22"/><path d="M10 15l-5.5 5.5" stroke-width="3.4"/></svg>',
+  sv:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.5"/><path d="M12 9v4M8 21l4-8 4 8"/></svg>',
+  rc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17c4-8 14-8 18 0"/><circle cx="12" cy="9" r="2"/></svg>',
+  match:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="10" rx="1.5"/><path d="M12 7v10M3 12h18"/></svg>',
+  dr:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 3-6.2"/><path d="M4 4v4h4"/></svg>',
+  cloud:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18a5 5 0 1 1 1-9.9A6 6 0 0 1 19 10a4 4 0 0 1-1 8z"/><path d="M12 16v-5M9.5 13.5 12 11l2.5 2.5"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+  back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>',
+  trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>',
+  flip:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 19H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5"/><path d="M13 5h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-5"/><circle cx="12" cy="12" r="3"/></svg>',
+  photo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></svg>',
+  save:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>',
+  send:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>',
+  lib:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="9" rx="1.5"/><rect x="3" y="15" width="7" height="6" rx="1.5"/><rect x="14" y="15" width="7" height="6" rx="1.5"/></svg>',
+  link:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="12" height="9" rx="1.5"/><path d="M6 17h4M8 13v4"/><rect x="16" y="8" width="6" height="12" rx="1.5"/></svg>',
+};
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+const pad = n => String(n).padStart(2, '0');
+const stamp = d => d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate()) + '-' + pad(d.getHours()) + pad(d.getMinutes()) + pad(d.getSeconds());
+const fmtDur = s => !s ? '' : s >= 60 ? `${Math.floor(s / 60)}:${pad(Math.round(s % 60))}` : s.toFixed(1) + 's';
+const fmtClock = s => Math.floor(s / 60) + ':' + pad(Math.floor(s % 60));
+function dayLabel(ts) {
+  const d0 = new Date(); d0.setHours(0,0,0,0);
+  const d = Math.floor((d0.getTime() + 864e5 - ts) / 864e5);
+  return d <= 0 ? 'Today' : d === 1 ? 'Yesterday' : new Date(ts).toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short' });
+}
+let toastT = null;
 function toast(m) {
-  const t = document.getElementById('toast');
-  t.textContent = m; t.classList.add('show');
-  clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 2200);
+  setTimeout(() => {
+    document.querySelectorAll('.toast').forEach(t => t.remove());
+    const d = document.createElement('div'); d.className = 'toast'; d.textContent = m; document.body.appendChild(d);
+    clearTimeout(toastT); toastT = setTimeout(() => d.remove(), 2200);
+  }, 0);
 }
-function pad(n) { return String(n).padStart(2, '0'); }
-function stamp(d) { return d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate()) + '-' + pad(d.getHours()) + pad(d.getMinutes()) + pad(d.getSeconds()); }
-function fmtDur(s) { return Math.floor(s/60) + ':' + pad(Math.floor(s%60)); }
+const urlCache = new Map();
+const blobURL = t => { if (!urlCache.has(t.id)) urlCache.set(t.id, URL.createObjectURL(t.blob)); return urlCache.get(t.id); };
 
-// ── home ──
-function renderHome() {
-  document.getElementById('strokes').innerHTML = Object.entries(TREE).map(([pid, p]) =>
-    `<div class="pillar-title">${p.name}</div><div class="stroke-grid">` +
-    p.strokes.map(([id, n]) => `<button class="stroke-btn" onclick="pickTarget('${id}')">${n}<span class="n">${id}</span></button>`).join('') +
-    `</div>`).join('');
-  renderTakes();
+// a still from the take, for the library grid
+function makeThumb(blob) {
+  return new Promise(res => {
+    const v = document.createElement('video'), u = URL.createObjectURL(blob);
+    let done = false;
+    const fin = x => { if (done) return; done = true; URL.revokeObjectURL(u); res(x); };
+    v.muted = true; v.playsInline = true; v.preload = 'auto'; v.src = u;
+    v.onloadeddata = () => { try { v.currentTime = Math.min(0.4, (v.duration || 1) / 2); } catch (e) { fin(null); } };
+    v.onseeked = () => {
+      try {
+        const cv = document.createElement('canvas'); const w = 240;
+        cv.width = w; cv.height = Math.round(w * (v.videoHeight || 16) / (v.videoWidth || 9));
+        cv.getContext('2d').drawImage(v, 0, 0, cv.width, cv.height);
+        fin(cv.toDataURL('image/jpeg', .7));
+      } catch (e) { fin(null); }
+    };
+    v.onerror = () => fin(null);
+    setTimeout(() => fin(null), 6000);
+  });
 }
-async function renderTakes() {
-  const takes = (await dbAll()).sort((a, b) => b.createdAt - a.createdAt);
-  document.getElementById('takeCount').textContent = takes.length ? takes.length + ' · ' + (takes.reduce((s,t) => s + t.size, 0) / 1e6).toFixed(0) + ' MB' : '';
-  const host = document.getElementById('takeList');
-  if (!takes.length) { host.innerHTML = '<div class="takes-empty">No takes yet — pick a stroke above and hit record.</div>'; return; }
-  host.innerHTML = takes.map(t => `
-    <div class="take">
-      <span class="t-dot"></span>
-      <div class="t-info">
-        <div class="t-name">${NAME[t.strokeId] || t.strokeId}</div>
-        <div class="t-meta">${fmtDur(t.dur)} · ${(t.size/1e6).toFixed(1)} MB · ${new Date(t.createdAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</div>
-      </div>
-      <button onclick="shareTake('${t.id}')" title="Share / AirDrop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button>
-      <button class="t-del" onclick="delTake('${t.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
-    </div>`).join('');
-}
-async function shareTake(id) {
-  const t = (await dbAll()).find(x => x.id === id);
-  if (!t) return;
-  const file = new File([t.blob], t.name, { type: t.blob.type || 'video/mp4' });
-  if (navigator.canShare && navigator.canShare({ files:[file] })) {
-    try { await navigator.share({ files:[file] }); return; } catch(e) { if (e.name === 'AbortError') return; }
+
+async function loadTakes() {
+  const all = await dbAll();
+  // takes from the old capture app carry only strokeId; fill in the rest
+  all.forEach(t => { if (!t.cat) t.cat = catOfId(t.strokeId); if (!t.sync) t.sync = 'local'; });
+  S.takes = all.sort((a, b) => b.createdAt - a.createdAt);
+  render();
+  for (const t of S.takes.filter(x => !x.thumb && x.blob).slice(0, 40)) {
+    t.thumb = await makeThumb(t.blob) || 'none';
+    await dbPut(t); render();
   }
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(t.blob); a.download = t.name;
-  document.body.appendChild(a); a.click(); a.remove();
-  toast('Downloading ' + t.name);
 }
-async function delTake(id) {
-  if (!confirm('Delete this take?')) return;
-  await dbDel(id); renderTakes();
+async function addTake({ strokeId, label, blob, dur, createdAt, quick }) {
+  const type = blob.type || 'video/mp4';
+  const ext = /quicktime/.test(type) ? 'mov' : type.includes('mp4') ? 'mp4' : 'webm';
+  const d = new Date(createdAt || Date.now());
+  const sameDay = S.takes.filter(t => t.strokeId === strokeId && dayLabel(t.createdAt) === dayLabel(d.getTime())).length;
+  const name = `replay~${strokeId}~${stamp(d)}~${sameDay + 1}.${ext}`;
+  const t = { id:uid(), strokeId, cat:catOfId(strokeId), label, name, blob, size:blob.size, dur:dur || 0, createdAt:d.getTime(), sync:'local', quick:!!quick };
+  S.takes.unshift(t);
+  await dbPut(t);
+  makeThumb(blob).then(async th => { t.thumb = th || 'none'; await dbPut(t); if (S.tab === 'library' && !S.cam && !S.quick) render(); });
+  return t;
 }
 
-// ── camera settings (persisted) ──
-const RES = [ [1280,720,'720p'], [1920,1080,'1080p'], [3840,2160,'4K'] ];
+/* ═════════ upload: the phone's share sheet → Save to Files (Drive / iCloud folder) ═════════ */
+async function shareTakes(list, markSent = true) {
+  const files = list.map(t => new File([t.blob], t.name, { type: t.blob.type || 'video/mp4' }));
+  if (navigator.canShare && navigator.canShare({ files })) {
+    try {
+      await navigator.share({ files });
+      if (markSent) { for (const t of list) { t.sync = 'sent'; await dbPut(t); } }
+      return true;
+    } catch (e) { if (e.name !== 'AbortError') toast('Sharing failed: ' + e.message); return false; }
+  }
+  // desktop browsers: download instead
+  for (const t of list) {
+    const a = document.createElement('a'); a.href = blobURL(t); a.download = t.name;
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+  if (markSent) { for (const t of list) { t.sync = 'sent'; await dbPut(t); } }
+  return true;
+}
+
+/* ═════════ tabs ═════════ */
+function tabs() {
+  const n = unsent().length;
+  return `<div class="tabs">
+    <button class="tab${S.tab === 'library' ? ' on' : ''}" data-tab="library">${I.lib}Library${n ? `<span class="dot">${n}</span>` : ''}</button>
+    <button class="tab mid${S.tab === 'record' ? ' on' : ''}" id="midBtn" aria-label="Record · hold for a quick clip"><i></i></button>
+    <button class="tab${S.tab === 'link' ? ' on' : ''}" data-tab="link">${I.link}PC link</button></div>`;
+}
+
+/* ═════════ record ═════════ */
+function recordScreen() {
+  const openIdx = CATS.findIndex(c => c[0] === S.open);
+  let h = `<div class="top"><span class="word">Record</span><span class="tact">
+    <label class="iconbtn" aria-label="Label a video from Photos">${I.photo}<input type="file" accept="video/*" id="photoPick"></label></span></div><div class="body">`;
+  if (S.importFile) h += `<div class="banner"><b>Tap what this video shows</b><button data-cancelimport>Cancel</button></div>`;
+  h += `<div class="cats">`;
+  CATS.forEach((c, i) => {
+    const n = S.takes.filter(t => t.cat === c[0]).length;
+    h += `<button class="cat${S.open === c[0] ? ' on' : ''}" data-open="${c[0]}">${I[c[0]]}${c[1]}<span class="n">${n || ''}</span></button>`;
+    if (i % 2 === 1 && S.open && Math.floor(openIdx / 2) === Math.floor(i / 2)) {
+      const tail = S.adding === S.open ? `<input class="new" id="newStroke" placeholder="Name" maxlength="24" autocomplete="off" enterkeyhint="done">`
+                                        : `<button class="opt add" data-add="${S.open}" aria-label="Add">+</button>`;
+      h += `<div class="drawer">${cat(S.open)[2].map(([id, n]) => `<button class="opt" data-pick="${S.open}|${esc(n)}">${esc(n)}</button>`).join('')}${tail}</div>`;
+    }
+  });
+  h += `</div>`;
+  const rec = S.recent.filter(([c, n]) => cat(c) && cat(c)[2].some(x => x[1] === n));
+  if (rec.length) h += `<div class="lab">RECENT</div><div class="quick">${rec.map(([c, n]) => `<button class="opt" data-pick="${c}|${esc(n)}">${SHORT[c]} ${esc(n)}</button>`).join('')}</div>`;
+  return h + `</div>` + tabs();
+}
+
+/* ═════════ library ═════════ */
+const secOf = t => STROKE.includes(t.cat) || t.cat === 'quick' ? 'strokes' : t.cat === 'match' ? 'matches' : 'drills';
+function libraryScreen() {
+  const list = S.takes.filter(t => secOf(t) === S.sec && (S.sec !== 'strokes' || S.filter === 'all' || t.cat === S.filter));
+  const count = k => S.takes.filter(t => secOf(t) === k).length;
+  const n = unsent().length;
+  let h = `<div class="top"><span class="word">Library</span></div><div class="body">`;
+  h += `<div class="seg">${[['strokes','STROKES'],['matches','MATCHES'],['drills','DRILLS']].map(([k, l]) => `<button data-sec="${k}" class="${S.sec === k ? 'on' : ''}">${l} · ${count(k)}</button>`).join('')}</div>`;
+  if (S.sec === 'strokes') h += `<div class="chips">${[['all','All'],['fh','FH'],['bh','BH'],['sv','Serve'],['rc','Receive']].map(([k, l]) => `<button class="chip${S.filter === k ? ' on' : ''}" data-f="${k}">${l}</button>`).join('')}</div>`;
+  if (n && !S.sel) h += `<div class="up"><span class="bi">${I.cloud}</span><b>${n} not on PC yet</b><button class="go" data-upall>Upload</button></div>`;
+  const th = (t, wide) => {
+    const on = S.sel && S.sel.has(t.id);
+    const mark = S.sel ? `<span class="tick${on ? '' : ' off'}">${on ? '✓' : ''}</span>` : `<span class="sync ${t.sync === 'sent' ? 'sent' : 'local'}">${t.sync === 'sent' ? I.check : I.cloud}</span>`;
+    const bg = t.thumb && t.thumb !== 'none' ? ` style="background-image:url(${t.thumb})"` : '';
+    return `<button class="thumb${wide ? ' wide' : ''}${on ? ' sel' : ''}" data-t="${t.id}"${bg}>${wide ? '' : `<span class="k">${SHORT[t.cat] || ''} · ${esc(labelOf(t))}</span>`}${mark}<span class="d">${fmtDur(t.dur)}</span></button>`;
+  };
+  if (!list.length) h += `<div class="empty">${I[S.sec === 'matches' ? 'match' : S.sec === 'drills' ? 'dr' : 'fh']}<span>Nothing here yet</span><button data-tab="record">Record</button></div>`;
+  else if (S.sec === 'matches') h += list.map(t => `<div class="mcard">${th(t, true)}<span class="mt"><b>${esc(labelOf(t))}</b><span>${dayLabel(t.createdAt)} · ${fmtDur(t.dur)}</span></span></div>`).join('');
+  else {
+    const groups = [];
+    list.forEach(t => { const l = dayLabel(t.createdAt); if (!groups.length || groups[groups.length - 1][0] !== l) groups.push([l, []]); groups[groups.length - 1][1].push(t); });
+    groups.forEach(([l, ts]) => { h += `<div class="ghead"><b>${l}</b><span>${ts.length}</span></div><div class="g3">${ts.map(t => th(t)).join('')}</div>`; });
+  }
+  h += `</div>`;
+  if (S.sel) return h + `<div class="actionbar"><button data-cancel>Cancel</button>
+    <button class="danger${S.delSure ? ' sure' : ''}" data-del>${S.delSure ? `Delete ${S.sel.size}?` : I.trash + S.sel.size}</button>
+    <button class="primary" data-up>${I.cloud}Upload ${S.sel.size}</button></div>`;
+  return h + tabs();
+}
+
+/* ═════════ PC link ═════════ */
+function linkScreen() {
+  const bytes = S.takes.reduce((a, t) => a + (t.size || 0), 0);
+  const sent = S.takes.filter(t => t.sync === 'sent');
+  return `<div class="top"><span class="word">PC link</span></div><div class="body">
+    <div class="card"><h3>Send clips to Smæsh on your PC</h3>
+      <ol><li>In <b>Library</b>, tap <b>Upload</b> (or hold clips to pick some).</li>
+      <li>Choose <b>Save to Files</b> and save into one folder, for example <b>Google Drive › Smæsh</b>.</li>
+      <li>On the PC, open Smæsh and press <b>Phone clips</b>. Pick that same folder the first time.</li></ol>
+      <p>Every clip is filed under its stroke with the date it was filmed.</p></div>
+    <div class="card"><h3>On this phone</h3>
+      <div class="stat"><span>Clips</span><b>${S.takes.length}</b></div>
+      <div class="stat"><span>Not on PC yet</span><b>${unsent().length}</b></div>
+      <div class="stat"><span>Space used</span><b>${(bytes / 1e6).toFixed(0)} MB</b></div>
+      ${sent.length ? `<button class="wide-btn danger${S.clearSure ? ' sure' : ''}" data-clearsent>${S.clearSure ? `Delete ${sent.length} uploaded clips from this phone?` : `Free space: delete ${sent.length} uploaded clips`}</button>` : ''}
+    </div></div>` + tabs();
+}
+
+/* ═════════ camera (full takes) ═════════ */
+const RES = [[1280,720,'720p'],[1920,1080,'1080p'],[3840,2160,'4K']];
 const FPS = [30, 60];
-const LIMITS = [ [0,'no limit'], [30,'30s'], [60,'1m'], [300,'5m'], [600,'10m'] ];
+const LIMITS = [[0,'off'],[30,'30s'],[60,'1m'],[300,'5m'],[600,'10m']];
 let cfg = { res:1, fps:1, limit:0, lens:'' };
-try { Object.assign(cfg, JSON.parse(localStorage.getItem('cap_cfg') || '{}')); } catch(e) {}
-function saveCfg() { localStorage.setItem('cap_cfg', JSON.stringify(cfg)); }
-let lenses = [];  // back cameras on multi-lens phones
-
+try { Object.assign(cfg, JSON.parse(localStorage.getItem('cap_cfg') || '{}')); } catch (e) {}
+const saveCfg = () => { try { localStorage.setItem('cap_cfg', JSON.stringify(cfg)); } catch (e) {} };
+let stream = null, lenses = [], facing = 'environment', wake = null;
 async function listLenses() {
-  try {
-    const devs = await navigator.mediaDevices.enumerateDevices();
-    lenses = devs.filter(d => d.kind === 'videoinput' && !/front|user|face/i.test(d.label));
-  } catch(e) { lenses = []; }
+  try { lenses = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'videoinput' && !/front|user|face/i.test(d.label)); } catch (e) { lenses = []; }
 }
-function lensLabel(d) {
-  const l = (d.label || '').toLowerCase();
-  if (l.includes('ultra')) return '0.5x';
-  if (l.includes('tele')) return '3x';
-  if (l.includes('back')) return '1x';
-  return (d.label || 'cam').slice(0, 6);
-}
-function cycle(key, arr) {
-  cfg[key] = (cfg[key] + 1) % arr.length;
-  saveCfg(); renderOpts(); startStream();
-}
-function cycleLens() {
-  if (lenses.length < 2) return;
-  const i = lenses.findIndex(d => d.deviceId === cfg.lens);
-  cfg.lens = lenses[(i + 1) % lenses.length].deviceId;
-  saveCfg(); renderOpts(); startStream();
-}
-function renderOpts() {
-  const host = document.getElementById('camOpts');
-  if (!host) return;
-  const cur = lenses.find(d => d.deviceId === cfg.lens);
-  host.innerHTML =
-    (lenses.length > 1 ? `<button class="opt-chip" onclick="cycleLens()"><span class="k">lens</span>${cur ? lensLabel(cur) : '1x'}</button>` : '') +
-    `<button class="opt-chip" onclick="cycle('res', RES)">${RES[cfg.res][2]}</button>` +
-    `<button class="opt-chip" onclick="cycle('fps', FPS)">${FPS[cfg.fps]} fps</button>` +
-    `<button class="opt-chip" onclick="cycle('limit', LIMITS)"><span class="k">auto-stop</span>${LIMITS[cfg.limit][1]}</button>`;
-}
-
-// ── camera ──
-let stream = null, rec = null, chunks = [], recStart = 0, timerH = null, limitH = null;
-let camStroke = null, facing = 'environment', takeNo = 1;
-
-function pickTarget(strokeId) {
-  if (importing) {
-    importStroke = strokeId;
-    document.getElementById('importPick').click();
-    return;
-  }
-  openCam(strokeId);
-}
-async function openCam(strokeId) {
-  camStroke = strokeId;
-  takeNo = 1;
-  document.getElementById('camStrokeName').textContent = NAME[strokeId] || strokeId;
-  document.getElementById('home').classList.remove('on');
-  document.getElementById('cam').classList.add('on');
-  updateCount();
-  await startStream();
-  await listLenses();   // labels only exist after permission granted
-  renderOpts();
-}
+const lensLabel = d => { const l = (d.label || '').toLowerCase(); return l.includes('ultra') ? '0.5x' : l.includes('tele') ? '3x' : '1x'; };
 async function startStream() {
   stopStream();
   try {
     const [w, h] = RES[cfg.res];
-    const video = { width: { ideal: w }, height: { ideal: h }, frameRate: { ideal: FPS[cfg.fps] } };
-    if (cfg.lens && facing === 'environment') video.deviceId = { exact: cfg.lens };
-    else video.facingMode = { ideal: facing };
-    stream = await navigator.mediaDevices.getUserMedia({ video, audio: true });
-    document.getElementById('preview').srcObject = stream;
-    const st = stream.getVideoTracks()[0].getSettings();
-    if (st.width) toast(`${st.width}x${st.height} @ ${st.frameRate || '?'}fps`);
-  } catch (e) {
-    toast('Camera blocked: ' + e.message);
-    closeCam();
-  }
+    const video = { width:{ ideal:w }, height:{ ideal:h }, frameRate:{ ideal:FPS[cfg.fps] } };
+    if (cfg.lens && facing === 'environment') video.deviceId = { exact:cfg.lens }; else video.facingMode = { ideal:facing };
+    stream = await navigator.mediaDevices.getUserMedia({ video, audio:true });
+    document.querySelectorAll('video.live').forEach(v => { v.srcObject = stream; });
+    try { wake = await navigator.wakeLock.request('screen'); } catch (e) {}
+    return true;
+  } catch (e) { toast('Camera blocked: ' + e.message); return false; }
 }
-function stopStream() {
-  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
-}
-function flipCam() {
-  if (rec) return toast('Stop recording first');
-  facing = facing === 'environment' ? 'user' : 'environment';
-  startStream();
-}
-function closeCam() {
-  if (rec) toggleRec();
-  stopStream();
-  document.getElementById('cam').classList.remove('on');
-  document.getElementById('home').classList.add('on');
-  renderTakes();
-}
-function updateCount() { document.getElementById('camCount').textContent = 'take ' + takeNo; }
-
+function stopStream() { if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; } if (wake) { wake.release().catch(() => {}); wake = null; } }
 function pickMime() {
-  const opts = ['video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm'];
-  for (const m of opts) if (window.MediaRecorder && MediaRecorder.isTypeSupported(m)) return m;
+  for (const m of ['video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm']) if (window.MediaRecorder && MediaRecorder.isTypeSupported(m)) return m;
   return '';
 }
-function toggleRec() {
-  if (!stream) return;
-  const btn = document.getElementById('recBtn');
-  const timer = document.getElementById('camTimer');
-  if (!rec) {
-    chunks = [];
-    const mime = pickMime();
-    const bps = [8_000_000, 14_000_000, 45_000_000][cfg.res];
-    try { rec = new MediaRecorder(stream, mime ? { mimeType: mime, videoBitsPerSecond: bps } : undefined); }
-    catch (e) { toast('Recording not supported: ' + e.message); return; }
-    rec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
-    rec.onstop = saveTake;
-    rec.start(1000);
-    recStart = Date.now();
-    btn.classList.add('rec');
-    timer.classList.add('rec');
+function makeRecorder(onDone) {
+  const chunks = [], mime = pickMime();
+  const bps = [8e6, 14e6, 45e6][cfg.res];
+  const r = new MediaRecorder(stream, mime ? { mimeType:mime, videoBitsPerSecond:bps } : undefined);
+  r.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+  r.onstop = () => onDone(chunks.length ? new Blob(chunks, { type:chunks[0].type || mime || 'video/mp4' }) : null);
+  r.start(1000);
+  return r;
+}
+
+function camHtml() {
+  const c = S.cam;
+  const cur = lenses.find(d => d.deviceId === cfg.lens);
+  const last = c.lastThumb ? ` style="background-image:url(${c.lastThumb})"` : '';
+  return `<div class="cam"><video class="live" autoplay playsinline muted></video>
+    <div class="ctop">${c.rec ? '' : `<button class="cbtn" data-camback aria-label="Back">${I.back}</button>`}
+      <span class="pill label">${SHORT[c.cat]} · ${esc(c.label)}</span>
+      <span class="timer${c.rec ? ' rec' : ''}" id="camTimer">0:00</span></div>
+    ${c.rec ? '<div style="margin-top:auto"></div>' : `<div class="opts">
+      ${lenses.length > 1 ? `<button class="ochip" data-o="lens"><span>lens</span>${cur ? lensLabel(cur) : '1x'}</button>` : ''}
+      <button class="ochip" data-o="res">${RES[cfg.res][2]}</button><button class="ochip" data-o="fps">${FPS[cfg.fps]} fps</button>
+      <button class="ochip" data-o="limit"><span>stop</span>${LIMITS[cfg.limit][1]}</button></div>`}
+    <div class="cbot"><button class="side" data-camlib${last} aria-label="Open library">${c.lastThumb ? '' : (c.takes || '')}</button>
+      <button class="shut${c.rec ? ' on' : ''}" data-shut aria-label="${c.rec ? 'Stop' : 'Record'}"><i></i></button>
+      <button class="side" data-flip aria-label="Flip camera">${I.flip}</button></div></div>`;
+}
+let recTimer = null, recLimit = null;
+async function openCam(catK, label) {
+  const hit = cat(catK)[2].find(x => x[1] === label);
+  S.cam = { cat:catK, label, strokeId: hit ? hit[0] : idFor(catK, label), rec:false, takes:0, rec0:0 };
+  S.recent = [[catK, label], ...S.recent.filter(r => !(r[0] === catK && r[1] === label))].slice(0, 4); saveRecent();
+  render();
+  if (await startStream()) { await listLenses(); render(); }
+}
+function camShutter() {
+  const c = S.cam; if (!c || !stream) return;
+  if (!c.rec) {
+    try { c.recorder = makeRecorder(async blob => {
+      if (!blob) return;
+      const t = await addTake({ strokeId:c.strokeId, label:c.label, blob, dur:(Date.now() - c.rec0) / 1000 });
+      c.takes++; toast(`Saved · ${SHORT[c.cat]} ${c.label} · take ${c.takes}`);
+      const th = await makeThumb(blob); if (th && S.cam === c) { c.lastThumb = th; render(); }
+    }); } catch (e) { toast('Recording not supported: ' + e.message); return; }
+    c.rec = true; c.rec0 = Date.now(); render();
     const lim = LIMITS[cfg.limit][0];
-    timerH = setInterval(() => {
-      const el = (Date.now() - recStart) / 1000;
-      timer.textContent = lim ? '-' + fmtDur(Math.max(0, lim - el)) : fmtDur(el);
-    }, 250);
-    if (lim) limitH = setTimeout(() => { if (rec) toggleRec(); }, lim * 1000);
+    recTimer = setInterval(() => { const el = document.getElementById('camTimer'); const s = (Date.now() - c.rec0) / 1000;
+      if (el) el.textContent = lim ? '-' + fmtClock(Math.max(0, lim - s)) : fmtClock(s); }, 250);
+    if (lim) recLimit = setTimeout(() => { if (c.rec) camShutter(); }, lim * 1000);
   } else {
-    rec.stop();
-    rec = null;
-    btn.classList.remove('rec');
-    timer.classList.remove('rec');
-    clearInterval(timerH);
-    clearTimeout(limitH);
-    timer.textContent = '0:00';
+    c.recorder.stop(); c.rec = false; clearInterval(recTimer); clearTimeout(recLimit); render();
   }
 }
-async function saveTake() {
-  if (!chunks.length) return;
-  const type = chunks[0].type || 'video/mp4';
-  const blob = new Blob(chunks, { type });
-  chunks = [];
-  const ext = type.includes('mp4') ? 'mp4' : 'webm';
-  const now = new Date();
-  const name = `replay~${camStroke}~${stamp(now)}~${takeNo}.${ext}`;
-  const dur = (Date.now() - recStart) / 1000;
-  await dbPut({ id: Date.now().toString(36) + Math.random().toString(36).slice(2),
-                strokeId: camStroke, name, blob, size: blob.size, dur, createdAt: now.getTime() });
-  takeNo++;
-  updateCount();
-  toast(`Saved · ${NAME[camStroke]} take ${takeNo - 1} (${fmtDur(dur)})`);
-}
+function closeCam() { if (S.cam && S.cam.rec) return; stopStream(); S.cam = null; render(); }
 
-// ── import from Photos: label a natively-filmed video (Cinematic, 4K...) ──
-let importing = false;
-function toggleImport() {
-  importing = !importing;
-  document.body.classList.toggle('importing', importing);
-}
-let importStroke = null;
-function onImportPick(e) {
-  const f = e.target.files[0];
-  e.target.value = '';
-  if (!f || !importStroke) return;
-  const ts = f.lastModified && f.lastModified > 631152000000 ? new Date(f.lastModified) : new Date();
-  const ext = (f.name.split('.').pop() || 'mp4').toLowerCase();
-  const name = `replay~${importStroke}~${stamp(ts)}~1.${ext}`;
-  dbPut({ id: Date.now().toString(36) + Math.random().toString(36).slice(2),
-          strokeId: importStroke, name, blob: f, size: f.size, dur: 0, createdAt: ts.getTime() })
-    .then(() => { toast('Labeled as ' + (NAME[importStroke] || importStroke)); renderTakes(); });
-  importing = false; importStroke = null;
-  document.body.classList.remove('importing');
-}
-
-// keep screen awake while camera screen is open (iOS 16.4+)
-let wake = null;
-document.addEventListener('visibilitychange', async () => {
-  if (document.visibilityState === 'visible' && document.getElementById('cam').classList.contains('on')) {
-    try { wake = await navigator.wakeLock.request('screen'); } catch (e) {}
+/* ═════════ quick camera: hold the record button ═════════ */
+const QMAX = 10000;
+function quickHtml() {
+  const q = S.quick;
+  if (q.mode === 'preview') {
+    return `<div class="cam"><video class="loop" src="${q.url}" autoplay loop playsinline></video>
+      <div class="ctop" style="background:none"><button class="xbtn" data-q="discard" aria-label="Discard">×</button>
+        <span class="timer" style="margin-left:auto">${fmtDur(q.dur)}</span></div>
+      <div class="pbar"><button class="save${q.saved ? ' done' : ''}" data-q="save">${q.saved ? I.check + 'Saved' : I.save + 'Save'}</button>
+        <button class="send" data-q="send">Send ${I.send}</button></div></div>`;
   }
+  return `<div class="cam"><video class="live" autoplay playsinline muted></video>
+    <div class="ctop" style="background:none">${q.rec ? '' : `<button class="cbtn" data-q="back" aria-label="Back">${I.back}</button>`}
+      ${q.rec ? `<span class="timer rec" id="qSecs">0.0s</span>` : ''}</div>
+    <span class="qtip" id="qTip">${q.rec ? 'Recording · let go to stop' : 'Hold to record · up to 10s'}</span>
+    <div class="cbot"><span style="width:48px"></span>
+      <button class="ring${q.rec ? ' on' : ''}" id="ring" aria-label="Hold to record"><svg viewBox="0 0 100 100"><circle class="bg" cx="50" cy="50" r="45"/><circle class="fg" cx="50" cy="50" r="45"/></svg><i></i></button>
+      <button class="side" data-flip aria-label="Flip camera">${I.flip}</button></div></div>`;
+}
+async function openQuick() {
+  S.quick = { mode:'live', rec:false };
+  render();
+  await startStream();
+}
+function quickStart() {
+  const q = S.quick; if (!q || q.rec || q.mode !== 'live' || !stream) return;
+  try { q.recorder = makeRecorder(blob => quickDone(blob)); } catch (e) { toast('Recording not supported'); return; }
+  q.rec = true; q.rec0 = performance.now();
+  document.getElementById('ring').classList.add('on');
+  const back = document.querySelector('[data-q=back]'); if (back) back.hidden = true;
+  const tip = document.getElementById('qTip'); if (tip) tip.textContent = 'Recording · let go to stop';
+  const tick = () => {
+    if (!S.quick || !S.quick.rec) return;
+    const p = Math.min(1, (performance.now() - q.rec0) / QMAX);
+    const fg = document.querySelector('.ring .fg'); if (fg) fg.style.strokeDashoffset = 283 * (1 - p);
+    if (p >= 1) { quickStop(); return; }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+function quickStop() {
+  const q = S.quick; if (!q || !q.rec) return;
+  q.rec = false; q.dur = (performance.now() - q.rec0) / 1000;
+  q.short = q.dur < 0.6;                      // a slip of the thumb, not a clip
+  q.recorder.stop();
+}
+function quickDone(blob) {
+  const q = S.quick; if (!q) return;
+  if (!blob || q.short) { q.mode = 'live'; render(); document.querySelectorAll('video.live').forEach(v => v.srcObject = stream); return; }
+  q.blob = blob; q.url = URL.createObjectURL(blob); q.mode = 'preview'; q.saved = false;
+  render();
+}
+function quickReset() {
+  const q = S.quick; if (q && q.url) URL.revokeObjectURL(q.url);
+  S.quick = { mode:'live', rec:false }; render();
+  document.querySelectorAll('video.live').forEach(v => v.srcObject = stream);
+}
+async function quickSave() {
+  const q = S.quick; if (q.saved) return q.take;
+  q.take = await addTake({ strokeId:'quick', label:'Quick clip', blob:q.blob, dur:q.dur, quick:true });
+  q.saved = true; render(); return q.take;
+}
+
+/* ═════════ player ═════════ */
+function playerHtml() {
+  const t = S.takes.find(x => x.id === S.player.id); if (!t) return '';
+  return `<div class="player"><div class="ctop"><button class="cbtn" data-pl="close" aria-label="Back">${I.back}</button>
+    <span class="pill label">${SHORT[t.cat] || ''} · ${esc(labelOf(t))}</span><span class="timer" style="font-size:13px">${dayLabel(t.createdAt)}</span></div>
+    <video src="${blobURL(t)}" controls autoplay playsinline loop></video>
+    <div class="pbar"><button class="save" data-pl="del" style="color:var(--danger)">${S.player.sure ? 'Delete?' : I.trash}</button>
+      <button class="send" data-pl="share">${t.sync === 'sent' ? 'Send again' : 'Upload'} ${I.cloud}</button></div></div>`;
+}
+
+/* ═════════ menus ═════════ */
+function menuHtml() {
+  const m = S.menu, name = esc(m.name);
+  return `<div class="menu" data-mclose><div class="sheet"><span class="grab"></span>` + (
+    m.mode === 'rename' ? `<div class="mh">Rename</div><input id="renameIn" value="${name}" maxlength="24" autocomplete="off" enterkeyhint="done">
+        <button class="act primary" data-m="saveName">Save</button><button class="act plain" data-m="cancel">Cancel</button>`
+    : m.mode === 'delete' ? `<div class="mh">Delete ${name}?</div><button class="act danger" data-m="doDelete">Delete</button><button class="act plain" data-m="cancel">Cancel</button>`
+    : `<div class="mh">${SHORT[m.cat]} · ${name}</div><button class="act" data-m="rename">Rename</button>
+        <button class="act danger" data-m="delete">Delete</button><button class="act plain" data-m="cancel">Cancel</button>`) + `</div></div>`;
+}
+
+/* ═════════ render + wiring ═════════ */
+function render() {
+  const app = document.getElementById('app'), layer = document.getElementById('layer');
+  const scroll = app.querySelector('.body') ? app.querySelector('.body').scrollTop : 0;
+  app.innerHTML = S.tab === 'record' ? recordScreen() : S.tab === 'library' ? libraryScreen() : linkScreen();
+  const b = app.querySelector('.body'); if (b) b.scrollTop = scroll;
+  const liveBefore = !!layer.querySelector('video.live');
+  layer.innerHTML = (S.cam ? camHtml() : '') + (S.quick ? quickHtml() : '') + (S.player ? playerHtml() : '') + (S.menu ? menuHtml() : '');
+  if (stream) layer.querySelectorAll('video.live').forEach(v => { v.srcObject = stream; });
+  wire();
+}
+function wire() {
+  const $$ = s => document.querySelectorAll(s);
+  $$('[data-tab]').forEach(b => b.onclick = () => { S.tab = b.dataset.tab; S.sel = null; S.delSure = false; S.clearSure = false; render(); });
+  // record tab button: tap = picker, hold = quick camera
+  const mid = document.getElementById('midBtn');
+  if (mid) {
+    let tm = null, held = false;
+    mid.onpointerdown = e => { e.preventDefault(); held = false; tm = setTimeout(() => { tm = null; held = true; openQuick(); }, 350); };
+    mid.onpointerup = () => { if (tm) { clearTimeout(tm); tm = null; S.tab = 'record'; S.sel = null; render(); } };
+    mid.onpointerleave = mid.onpointercancel = () => { if (tm) { clearTimeout(tm); tm = null; } };
+    mid.oncontextmenu = e => e.preventDefault();
+  }
+  // record: categories, add, hold to rename/delete
+  $$('[data-open]').forEach(b => b.onclick = () => { S.open = S.open === b.dataset.open ? null : b.dataset.open; S.adding = null; render(); });
+  $$('[data-add]').forEach(b => b.onclick = () => { S.adding = b.dataset.add; render(); });
+  const nw = document.getElementById('newStroke');
+  if (nw) {
+    nw.focus();
+    const done = keep => {
+      nw.onblur = null;
+      const v = nw.value.trim(), list = cat(S.adding)[2];
+      if (keep && v && !list.some(x => x[1].toLowerCase() === v.toLowerCase())) { list.push([idFor(S.adding, v), v]); saveCats(); toast('Added ' + v); }
+      S.adding = null; render();
+    };
+    nw.onkeydown = e => { if (e.key === 'Enter') done(true); if (e.key === 'Escape') done(false); };
+    nw.onblur = () => done(true);
+  }
+  $$('[data-pick]').forEach(b => {
+    let tm = null;
+    if (b.closest('.drawer')) {
+      b.onpointerdown = () => { b.classList.add('hold'); tm = setTimeout(() => { tm = null; b._held = true; const [c, n] = b.dataset.pick.split('|'); S.menu = { cat:c, name:n }; render(); }, 480); };
+      b.onpointerup = b.onpointerleave = b.onpointercancel = () => { if (tm) clearTimeout(tm); tm = null; b.classList.remove('hold'); };
+      b.oncontextmenu = e => e.preventDefault();
+    }
+    b.onclick = async () => {
+      if (b._held) { b._held = false; return; }
+      const [c, n] = b.dataset.pick.split('|');
+      if (S.importFile) {                                    // labelling a video from Photos
+        const f = S.importFile; S.importFile = null;
+        const hit = cat(c)[2].find(x => x[1] === n);
+        const ts = f.lastModified && f.lastModified > 631152000000 ? f.lastModified : Date.now();
+        await addTake({ strokeId: hit ? hit[0] : idFor(c, n), label:n, blob:f, dur:0, createdAt:ts });
+        toast(`Added to Library · ${SHORT[c]} ${n}`); render(); return;
+      }
+      openCam(c, n);
+    };
+  });
+  const pp = document.getElementById('photoPick');
+  if (pp) pp.onchange = () => { const f = pp.files[0]; pp.value = ''; if (f) { S.importFile = f; S.tab = 'record'; render(); } };
+  $$('[data-cancelimport]').forEach(b => b.onclick = () => { S.importFile = null; render(); });
+  $$('[data-m]').forEach(b => b.onclick = e => {
+    e.stopPropagation();
+    const m = S.menu, list = cat(m.cat)[2], a = b.dataset.m, i = list.findIndex(x => x[1] === m.name);
+    if (a === 'cancel') S.menu = null;
+    else if (a === 'rename' || a === 'delete') m.mode = a;
+    else if (a === 'doDelete') { if (i >= 0) list.splice(i, 1); saveCats(); S.menu = null; toast('Deleted ' + m.name); }
+    else if (a === 'saveName') {
+      const v = document.getElementById('renameIn').value.trim();
+      if (v && v !== m.name && i >= 0) {
+        list[i] = [idFor(m.cat, v), v];
+        S.recent = S.recent.map(r => (r[0] === m.cat && r[1] === m.name) ? [m.cat, v] : r); saveRecent(); saveCats(); toast('Renamed to ' + v);
+      }
+      S.menu = null;
+    }
+    render();
+  });
+  const menuEl = document.querySelector('[data-mclose]');
+  if (menuEl) menuEl.onclick = e => { if (e.target === menuEl) { S.menu = null; render(); } };
+  const ri = document.getElementById('renameIn');
+  if (ri) { ri.focus(); ri.select(); ri.onkeydown = e => { if (e.key === 'Enter') document.querySelector('[data-m=saveName]').click(); }; }
+
+  // library
+  $$('[data-sec]').forEach(b => b.onclick = () => { S.sec = b.dataset.sec; S.filter = 'all'; S.sel = null; render(); });
+  $$('[data-f]').forEach(b => b.onclick = () => { S.filter = b.dataset.f; render(); });
+  $$('[data-upall]').forEach(b => b.onclick = async () => { if (await shareTakes(unsent())) { toast('Uploaded · import them on the PC'); render(); } });
+  $$('.thumb[data-t]').forEach(b => {
+    let tm = null;
+    b.onpointerdown = () => { if (S.sel) return; tm = setTimeout(() => { tm = null; S.sel = new Set([b.dataset.t]); S.delSure = false; b._held = true; render(); }, 450); };
+    b.onpointerup = b.onpointerleave = b.onpointercancel = () => { if (tm) clearTimeout(tm); tm = null; };
+    b.oncontextmenu = e => e.preventDefault();
+    b.onclick = () => {
+      if (b._held) { b._held = false; return; }
+      if (!S.sel) { S.player = { id:b.dataset.t }; render(); return; }
+      S.sel.has(b.dataset.t) ? S.sel.delete(b.dataset.t) : S.sel.add(b.dataset.t);
+      S.delSure = false; if (!S.sel.size) S.sel = null; render();
+    };
+  });
+  $$('[data-cancel]').forEach(b => b.onclick = () => { S.sel = null; S.delSure = false; render(); });
+  $$('[data-up]').forEach(b => b.onclick = async () => {
+    const list = S.takes.filter(t => S.sel.has(t.id));
+    if (await shareTakes(list)) { S.sel = null; toast(`Uploaded ${list.length}`); render(); }
+  });
+  $$('[data-del]').forEach(b => b.onclick = async () => {
+    if (!S.delSure) { S.delSure = true; render(); return; }
+    const ids = [...S.sel]; for (const id of ids) await dbDel(id);
+    S.takes = S.takes.filter(t => !S.sel.has(t.id)); S.sel = null; S.delSure = false; render(); toast(`Deleted ${ids.length}`);
+  });
+  $$('[data-clearsent]').forEach(b => b.onclick = async () => {
+    if (!S.clearSure) { S.clearSure = true; render(); return; }
+    const gone = S.takes.filter(t => t.sync === 'sent'); for (const t of gone) await dbDel(t.id);
+    S.takes = S.takes.filter(t => t.sync !== 'sent'); S.clearSure = false; render(); toast(`Freed ${gone.length} clips`);
+  });
+  $$('[data-pl]').forEach(b => b.onclick = async () => {
+    const t = S.takes.find(x => x.id === S.player.id), a = b.dataset.pl;
+    if (a === 'close') { S.player = null; render(); }
+    else if (a === 'share') { if (await shareTakes([t])) { toast('Uploaded'); render(); } }
+    else if (a === 'del') {
+      if (!S.player.sure) { S.player.sure = true; render(); return; }
+      await dbDel(t.id); S.takes = S.takes.filter(x => x.id !== t.id); S.player = null; render(); toast('Deleted');
+    }
+  });
+
+  // camera
+  $$('[data-shut]').forEach(b => b.onclick = camShutter);
+  $$('[data-camback]').forEach(b => b.onclick = closeCam);
+  $$('[data-camlib]').forEach(b => b.onclick = () => {
+    const c = S.cam; if (!c || c.rec) return;
+    stopStream(); S.cam = null; S.tab = 'library';
+    S.sec = STROKE.includes(c.cat) ? 'strokes' : c.cat === 'match' ? 'matches' : 'drills'; S.filter = STROKE.includes(c.cat) ? c.cat : 'all';
+    render();
+  });
+  $$('[data-flip]').forEach(b => b.onclick = () => {
+    if ((S.cam && S.cam.rec) || (S.quick && S.quick.rec)) return;
+    facing = facing === 'environment' ? 'user' : 'environment'; startStream();
+  });
+  $$('[data-o]').forEach(b => b.onclick = () => {
+    const k = b.dataset.o;
+    if (k === 'lens') { if (lenses.length < 2) return; const i = lenses.findIndex(d => d.deviceId === cfg.lens); cfg.lens = lenses[(i + 1) % lenses.length].deviceId; }
+    else cfg[k] = (cfg[k] + 1) % (k === 'res' ? RES : k === 'fps' ? FPS : LIMITS).length;
+    saveCfg(); render(); startStream();
+  });
+  // quick camera
+  const ring = document.getElementById('ring');
+  if (ring) { ring.onpointerdown = e => { e.preventDefault(); quickStart(); }; ring.oncontextmenu = e => e.preventDefault(); }
+  $$('[data-q]').forEach(b => b.onclick = async () => {
+    const a = b.dataset.q;
+    if (a === 'back') { stopStream(); S.quick = null; render(); }
+    else if (a === 'discard') { if (!S.quick.saved) toast('Discarded'); quickReset(); }
+    else if (a === 'save') { await quickSave(); toast('Saved to Library'); }
+    else if (a === 'send') {
+      // any contact on the phone: Messages, Snapchat, WhatsApp… via the share sheet
+      const q = S.quick;
+      const file = new File([q.blob], `smaesh-${stamp(new Date())}.${(q.blob.type || '').includes('mp4') ? 'mp4' : 'webm'}`, { type:q.blob.type || 'video/mp4' });
+      if (navigator.canShare && navigator.canShare({ files:[file] })) {
+        try { await navigator.share({ files:[file] }); toast('Sent'); quickReset(); } catch (e) { if (e.name !== 'AbortError') toast('Sending failed'); }
+      } else toast('Sending needs the phone app');
+    }
+  });
+}
+window.addEventListener('pointerup', () => { if (S.quick && S.quick.rec) quickStop(); });
+window.addEventListener('pointercancel', () => { if (S.quick && S.quick.rec) quickStop(); });
+document.addEventListener('visibilitychange', () => {
+  // the camera doesn't survive the app going to the background: stop cleanly
+  if (document.visibilityState === 'hidden') {
+    if (S.cam && S.cam.rec) camShutter();
+    if (S.quick && S.quick.rec) quickStop();
+  } else if ((S.cam || (S.quick && S.quick.mode === 'live')) && !stream) startStream();
 });
 
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
-renderHome();
+render();
+loadTakes();
 </script>
 </body>
 </html>

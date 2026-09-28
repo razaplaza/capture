@@ -1,10 +1,10 @@
 {
-  "name": "Replay Capture",
-  "short_name": "Capture",
+  "name": "Smæsh",
+  "short_name": "Smæsh",
   "start_url": "./capture.html",
   "display": "standalone",
-  "background_color": "#0a0a0c",
-  "theme_color": "#0a0a0c",
+  "background_color": "#11161c",
+  "theme_color": "#11161c",
   "icons": [
     { "src": "icon-180.png", "sizes": "180x180", "type": "image/png" }
   ]
