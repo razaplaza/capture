@@ -1119,7 +1119,20 @@ document.addEventListener('visibilitychange', () => {
   } else if ((S.cam || (S.quick && S.quick.mode === 'live')) && !stream) startStream();
 });
 
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+if ('serviceWorker' in navigator) {
+  // check for a new version on every launch and whenever the app comes back
+  // to the foreground; when one takes over, reload into it (never mid-take)
+  navigator.serviceWorker.register('sw.js', { updateViaCache:'none' }).then(reg => {
+    reg.update().catch(() => {});
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') reg.update().catch(() => {}); });
+  }).catch(() => {});
+  let reloaded = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (reloaded) return;
+    const busy = (S.cam && S.cam.rec) || (S.quick && S.quick.rec);
+    if (!busy) { reloaded = true; location.reload(); }
+  });
+}
 render();
 loadTakes();
 </script>
