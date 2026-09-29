@@ -36,7 +36,7 @@
   .iconbtn input { position:absolute; inset:0; opacity:0; }
   .body { flex:1; min-height:0; overflow-y:auto; padding:10px 18px 20px; display:flex; flex-direction:column; gap:14px; -webkit-overflow-scrolling:touch; }
   .lab { font-size:11.5px; font-weight:700; letter-spacing:.08em; color:var(--mute); }
-  .tabs { flex-shrink:0; background:#131a21; border-top:1px solid var(--line); display:grid; grid-template-columns:repeat(3,1fr);
+  .tabs { flex-shrink:0; background:#131a21; border-top:1px solid var(--line); display:grid; grid-template-columns:repeat(5,1fr);
           align-items:center; padding:8px 0 calc(var(--sb) + 8px); }
   .tab { display:flex; flex-direction:column; align-items:center; gap:4px; font-size:11px; color:var(--mute); position:relative; }
   .tab.on { color:var(--teal); }
@@ -224,6 +224,46 @@
   .pick .sheet { max-height:78vh; }
   .pick .grid { overflow-y:auto; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
   @media (orientation: landscape) { .pick .grid { grid-template-columns:repeat(5,minmax(0,1fr)); } }
+
+  /* ═════ inbox / friends ═════ */
+  .irow { display:flex; align-items:center; gap:13px; padding:11px 4px; width:100%; text-align:left; border-radius:12px; }
+  .irow:active { background:var(--card); }
+  .av { width:48px; height:48px; border-radius:50%; display:grid; place-items:center; font-weight:700; font-size:16px; color:#0d1116; flex-shrink:0; }
+  .irow .who { font-weight:700; font-size:16px; }
+  .irow .st { display:flex; align-items:center; gap:7px; margin-top:3px; font-size:13px; color:var(--mute); }
+  .irow .st i { width:13px; height:13px; border-radius:3px; border:1.6px solid var(--mute); flex-shrink:0; }
+  .irow .st.fresh { color:#ff8a3d; font-weight:700; } .irow .st.fresh i { background:#ff8a3d; border-color:#ff8a3d; }
+  .irow .st.out i { border:0; width:0; height:0; border-left:11px solid var(--blue, #6aa9ff); border-top:6px solid transparent; border-bottom:6px solid transparent; border-radius:0; }
+  .irow .st.out.op i { border:1.6px solid #6aa9ff; width:11px; height:11px; border-radius:2px; }
+  .irow .when { margin-left:auto; align-self:flex-start; padding-top:5px; font-size:12px; color:var(--mute); }
+  .field { display:flex; gap:8px; }
+  .field input { flex:1; min-width:0; background:#0d1116; border:1px solid var(--edge); border-radius:12px; padding:13px 14px; color:var(--ink); font-size:16px; outline:none;
+                 user-select:text; -webkit-user-select:text; }
+  .field input:focus { border-color:var(--teal); }
+  .field button { background:var(--teal); color:#062825; font-weight:700; border-radius:12px; padding:0 16px; }
+  .friend { display:flex; align-items:center; gap:12px; padding:8px 0; }
+  .friend .av { width:40px; height:40px; font-size:14px; } .friend b { font-weight:600; flex:1; }
+  .friend button { color:var(--mute); font-size:13px; }
+  .note { font-size:12.5px; color:var(--mute); text-align:center; }
+  /* snap viewer */
+  .snapv { position:fixed; inset:0; z-index:38; background:#000; touch-action:none; user-select:none; }
+  .snapv video { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; }
+  .snapv .bars { position:absolute; z-index:3; left:10px; right:10px; top:calc(var(--st) + 8px); display:flex; gap:4px; }
+  .snapv .bars i { flex:1; height:3px; border-radius:2px; background:rgba(255,255,255,.3); overflow:hidden; } .snapv .bars b { display:block; height:100%; width:0; background:#fff; }
+  .snapv .head { position:absolute; z-index:3; left:12px; right:12px; top:calc(var(--st) + 20px); display:flex; align-items:center; gap:10px; }
+  .snapv .head .av { width:36px; height:36px; font-size:13px; } .snapv .head b { display:block; font-size:15px; } .snapv .head span { font-size:12px; color:rgba(255,255,255,.75); }
+  .snapv .note-card { position:absolute; z-index:3; left:14px; right:14px; bottom:calc(var(--sb) + 26px); padding:13px 15px; border-radius:16px; font-size:16px; line-height:1.4;
+                      background:rgba(10,12,15,.6); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,.12); }
+  .snapv .textonly { position:absolute; inset:0; display:grid; place-items:center; padding:30px; font-size:24px; font-weight:700; text-align:center; line-height:1.3; }
+  .snapv .loading { position:absolute; inset:0; display:grid; place-items:center; color:var(--mute); }
+  .rsheet { position:absolute; z-index:5; left:0; right:0; bottom:0; background:#141b22; border-radius:22px 22px 0 0; border-top:1px solid var(--edge);
+            padding:14px 16px calc(var(--sb) + 18px); display:flex; flex-direction:column; gap:12px; animation:up .2s ease-out; }
+  .rsheet .chips2 { display:flex; flex-wrap:wrap; gap:8px; }
+  .rsheet .chips2 button { border:1px solid var(--edge); background:var(--card); border-radius:999px; padding:9px 14px; font-weight:600; font-size:14px; }
+  .bigbtn { display:flex; align-items:center; justify-content:center; gap:8px; border-radius:14px; padding:14px; font-weight:700; background:var(--teal); color:#062825; }
+  .bigbtn.ghost { background:var(--card); color:var(--ink); border:1px solid var(--edge); }
+  .bigbtn svg { width:19px; height:19px; }
+
   .toast { position:fixed; left:50%; top:calc(var(--st) + 70px); transform:translateX(-50%); z-index:60; background:var(--ink); color:#0d1116; font-weight:600;
            font-size:14px; padding:10px 17px; border-radius:999px; white-space:nowrap; max-width:92vw; overflow:hidden; text-overflow:ellipsis; pointer-events:none; }
   @media (prefers-reduced-motion: reduce) { * { animation:none !important; transition:none !important; } }
@@ -325,6 +365,9 @@ const I = {
   linkOn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>',
   ghost:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="13" height="13" rx="2"/><rect x="8" y="3" width="13" height="13" rx="2" stroke-dasharray="3 3"/></svg>',
   swap:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16M7 4 3 8M7 4l4 4M17 20V4M17 20l-4-4M17 20l4-4"/></svg>',
+  msg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-12 7l-6 2 2-6a8 8 0 1 1 16-3z"/></svg>',
+  user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/></svg>',
+  refresh:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>',
   link:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="12" height="9" rx="1.5"/><path d="M6 17h4M8 13v4"/><rect x="16" y="8" width="6" height="12" rx="1.5"/></svg>',
 };
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
@@ -417,8 +460,10 @@ function tabs() {
   const n = unsent().length;
   return `<div class="tabs">
     <button class="tab${S.tab === 'library' ? ' on' : ''}" data-tab="library">${I.lib}Library${n ? `<span class="dot">${n}</span>` : ''}</button>
+    <button class="tab${S.tab === 'inbox' ? ' on' : ''}" data-tab="inbox">${I.msg}Inbox${unread() ? `<span class="dot" style="background:#ff8a3d">${unread()}</span>` : ''}</button>
     <button class="tab mid${S.tab === 'record' ? ' on' : ''}" id="midBtn" aria-label="Record · hold for a quick clip"><i></i></button>
-    <button class="tab${S.tab === 'link' ? ' on' : ''}" data-tab="link">${I.link}PC link</button></div>`;
+    <button class="tab${S.tab === 'link' ? ' on' : ''}" data-tab="link">${I.link}PC link</button>
+    <button class="tab${S.tab === 'me' ? ' on' : ''}" data-tab="me">${I.user}Me</button></div>`;
 }
 
 /* ═════════ record ═════════ */
@@ -631,7 +676,7 @@ function quickDone(blob) {
 }
 function quickReset() {
   const q = S.quick; if (q && q.url) URL.revokeObjectURL(q.url);
-  S.quick = { mode:'live', rec:false }; render();
+  S.quick = { mode:'live', rec:false, to: q && q.to }; render();
   document.querySelectorAll('video.live').forEach(v => v.srcObject = stream);
 }
 async function quickSave() {
@@ -737,6 +782,7 @@ function openReview(list, i) {
     <div class="fl tr">
       <span class="fchip nav"><button data-rv="prev" aria-label="Previous clip">${I.chevL}</button><span id="rvIdx"></span><button data-rv="next" aria-label="Next clip">${I.chevR}</button></span>
       <button class="fb" data-rv="cmp" aria-label="Compare">${I.cmp}</button>
+      <button class="fb" data-rv="send" aria-label="Send to a friend">${I.send}</button>
       <button class="fb" data-rv="share" id="rvShare" aria-label="Upload">${I.cloud}</button>
       <button class="fb warn" data-rv="del" id="rvDel" aria-label="Delete">${I.trash}</button></div>
     <div class="fl bl"><button class="fb" data-rv="play" id="rvPlay" aria-label="Play or pause">${I.pause}</button>
@@ -816,6 +862,7 @@ async function rvAction(a) {
     drawAb();
   }
   else if (a === 'cmp') { v.pause(); pickSecond(t); }
+  else if (a === 'send') { v.pause(); openSendSheet(t.blob); }
   else if (a === 'share') { if (await shareTakes([t])) { toast('Uploaded'); loadRV(); render(); } }
   else if (a === 'del') {
     const b = root.querySelector('#rvDel');
@@ -935,6 +982,193 @@ function openCompare(a, b) {
   CP.raf = requestAnimationFrame(tick);
 }
 
+
+/* ═════════ friends & clip messages (Cloudflare Worker + KV, 48 h) ═════════ */
+const DEFAULT_SERVER = 'https://replayproxy.razaplaza-video.workers.dev';
+const LS = (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } };
+const LSset = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+const M = { me: LS('smaesh_me', ''), server: LS('smaesh_server', DEFAULT_SERVER), friends: LS('smaesh_friends', []),
+            received: [], sent: [], loaded: false, error: '', busy: false };
+const nk = s => String(s || '').trim().toLowerCase().replace(/[^a-z0-9æøå]+/g, '-').replace(/^-|-$/g, '').slice(0, 24);
+const HUES = ['#3fd2c7','#ff8a3d','#6aa9ff','#4ee39a','#ffb547','#c49bff','#ff6b8b'];
+const hue = n => HUES[[...nk(n)].reduce((a, c) => a + c.charCodeAt(0), 0) % HUES.length];
+const initials = n => String(n).trim().split(/\s+/).map(w => w[0] || '').join('').slice(0, 2).toUpperCase() || '?';
+const ago = ts => { const m = Math.round((Date.now() - ts) / 6e4); return m < 1 ? 'now' : m < 60 ? m + 'm' : m < 1440 ? Math.round(m / 60) + 'h' : Math.round(m / 1440) + 'd'; };
+const unread = () => M.received.filter(x => !x.opened).length;
+const api = (path, opt) => fetch(M.server.replace(/\/+$/, '') + path, opt).then(async r => { const j = r.headers.get('content-type')?.includes('json') ? await r.json() : null;
+  if (!r.ok) throw new Error((j && j.error) || ('server ' + r.status)); return j || r; });
+function addFriend(name) {
+  name = String(name || '').trim().slice(0, 24); if (!name || nk(name) === nk(M.me)) return;
+  if (!M.friends.some(f => nk(f) === nk(name))) { M.friends.push(name); LSset('smaesh_friends', M.friends); }
+}
+async function refreshInbox(quiet) {
+  if (!M.me || M.busy) return;
+  M.busy = true;
+  try {
+    const j = await api('/inbox?me=' + encodeURIComponent(M.me));
+    M.received = j.received || []; M.sent = j.sent || []; M.loaded = true; M.error = '';
+    M.received.forEach(x => addFriend(x.fromName || x.from));
+  } catch (e) { M.error = e.message; if (!quiet) toast('Inbox: ' + e.message); }
+  M.busy = false;
+  if (S.tab === 'inbox' || S.tab === 'me' || !quiet) render(); else render();
+}
+let inboxTimer = null;
+function pollInbox() {
+  clearInterval(inboxTimer);
+  // only while the inbox is on screen: the free plan allows ~500 checks a day
+  if (S.tab === 'inbox' && document.visibilityState === 'visible') inboxTimer = setInterval(() => refreshInbox(true), 30000);
+}
+async function sendToFriend(to, blob, note) {
+  if (!M.me) { toast('Pick your name in Me first'); return false; }
+  if (blob && blob.size > 24 * 1024 * 1024) { toast('Too big to send (max 24 MB) · try a quick clip'); return false; }
+  toast(`Sending to ${to}…`);
+  try {
+    await api(`/send?from=${encodeURIComponent(M.me)}&to=${encodeURIComponent(to)}&note=${encodeURIComponent(note || '')}`,
+      { method:'POST', body: blob || '', headers: blob ? { 'content-type': blob.type || 'video/mp4' } : {} });
+    addFriend(to); toast('Sent to ' + to); refreshInbox(true); return true;
+  } catch (e) { toast('Not sent: ' + e.message); return false; }
+}
+
+function inboxScreen() {
+  let h = `<div class="top"><span class="word">Inbox</span><span class="tact">
+    <button class="iconbtn" data-ib="refresh" aria-label="Refresh">${I.refresh}</button></span></div><div class="body">`;
+  if (!M.me) return h + nameCard() + `</div>` + tabs();
+  if (M.error && !M.loaded) h += `<div class="card"><h3>Can't reach the inbox</h3><p>${esc(M.error)}</p><p>Check the server in <b>Me</b>.</p></div>`;
+  // one row per person, newest activity first
+  const people = new Map();
+  M.received.forEach(x => { const k = x.from; const p = people.get(k) || { name:x.fromName || x.from, rec:[], sent:[] }; p.rec.push(x); people.set(k, p); });
+  M.sent.forEach(x => { const k = x.to; const p = people.get(k) || { name:x.toName || x.to, rec:[], sent:[] }; p.sent.push(x); people.set(k, p); });
+  M.friends.forEach(f => { if (!people.has(nk(f))) people.set(nk(f), { name:f, rec:[], sent:[] }); });
+  const rows = [...people.values()].map(p => {
+    const last = [...p.rec, ...p.sent].sort((a, b) => b.ts - a.ts)[0];
+    const fresh = p.rec.filter(x => !x.opened);
+    return { ...p, last, fresh };
+  }).sort((a, b) => (b.fresh.length - a.fresh.length) || ((b.last ? b.last.ts : 0) - (a.last ? a.last.ts : 0)));
+  if (!rows.length) h += `<div class="empty">${I.msg}<span>No clips yet. Hold the record button, film something, then Send.</span></div>`;
+  rows.forEach(r => {
+    let st = '<span class="st"><i></i>Tap to send a clip</span>';
+    if (r.fresh.length) st = `<span class="st fresh"><i></i>New clip${r.fresh.length > 1 ? 's' : ''} · ${r.fresh.length}</span>`;
+    else if (r.last && r.last.from === nk(M.me)) st = `<span class="st out${r.last.opened ? ' op' : ''}"><i></i>${r.last.opened ? 'Opened' : 'Delivered'}</span>`;
+    else if (r.last) st = `<span class="st"><i></i>Opened · tap to replay</span>`;
+    h += `<button class="irow" data-person="${esc(nk(r.name))}"><span class="av" style="background:${hue(r.name)}">${esc(initials(r.name))}</span>
+      <span><div class="who">${esc(r.name)}</div>${st}</span><span class="when">${r.last ? ago(r.last.ts) : ''}</span></button>`;
+  });
+  h += `<p class="note">Clips disappear after 48 hours.</p>`;
+  return h + `</div>` + tabs();
+}
+function nameCard() {
+  return `<div class="card"><h3>Your Smæsh name</h3><p>Friends send clips to this name.</p>
+    <div class="field"><input id="meName" placeholder="e.g. Waja" maxlength="24" autocomplete="off" value="${esc(M.me)}"><button data-me="save">Save</button></div></div>`;
+}
+function meScreen() {
+  let h = `<div class="top"><span class="word">Me</span></div><div class="body">` + nameCard();
+  h += `<div class="card"><h3>Friends</h3>${M.friends.length ? M.friends.map(f => `<div class="friend"><span class="av" style="background:${hue(f)}">${esc(initials(f))}</span><b>${esc(f)}</b>
+      <button data-unfriend="${esc(f)}">Remove</button></div>`).join('') : '<p>Add the name your friend picked.</p>'}
+    <div class="field"><input id="friendName" placeholder="Friend's Smæsh name" maxlength="24" autocomplete="off"><button data-me="friend">Add</button></div></div>`;
+  h += `<div class="card"><h3>Server</h3><p>Where clips are passed between friends. Clips are kept for 48 hours.</p>
+    <div class="field"><input id="serverUrl" value="${esc(M.server)}" autocomplete="off" inputmode="url"><button data-me="server">Save</button></div>
+    <button class="wide-btn" data-me="test">Test connection</button></div>`;
+  return h + `</div>` + tabs();
+}
+
+/* send sheet: friends first, then any app on the phone */
+function openSendSheet(blob, defaultTo, onSent) {
+  const d = document.createElement('div'); d.className = 'menu';
+  const people = [...M.friends];
+  d.innerHTML = `<div class="sheet"><span class="grab"></span><div class="mh">Send to</div>
+    ${people.map(f => `<button class="irow" data-to="${esc(f)}"><span class="av" style="background:${hue(f)}">${esc(initials(f))}</span><span><div class="who">${esc(f)}</div></span>
+      <span class="when" style="padding-top:0">${defaultTo && nk(defaultTo) === nk(f) ? '●' : ''}</span></button>`).join('')}
+    <div class="field"><input id="sendNew" placeholder="${people.length ? 'Someone else: their Smæsh name' : 'Friend\'s Smæsh name'}" maxlength="24" autocomplete="off"><button data-go>Send</button></div>
+    <div class="field"><input id="sendNote" placeholder="Add a question or comment (optional)" maxlength="200" autocomplete="off"></div>
+    <button class="act" data-other>Other apps…</button><button class="act plain" data-x>Cancel</button></div>`;
+  const note = () => d.querySelector('#sendNote').value.trim();
+  const go = async to => { d.remove(); if (await sendToFriend(to, blob, note()) && onSent) onSent(); };
+  d.querySelectorAll('[data-to]').forEach(b => b.onclick = () => go(b.dataset.to));
+  d.querySelector('[data-go]').onclick = () => { const v = d.querySelector('#sendNew').value.trim(); if (v) go(v); };
+  d.querySelector('[data-x]').onclick = () => d.remove();
+  d.onclick = e => { if (e.target === d) d.remove(); };
+  d.querySelector('[data-other]').onclick = async () => {
+    const file = new File([blob], `smaesh-${stamp(new Date())}.${(blob.type || '').includes('mp4') ? 'mp4' : 'webm'}`, { type:blob.type || 'video/mp4' });
+    d.remove();
+    if (navigator.canShare && navigator.canShare({ files:[file] })) { try { await navigator.share({ files:[file] }); } catch (e) {} }
+    else toast('Sharing needs the phone app');
+  };
+  document.body.appendChild(d);
+  if (!people.length) d.querySelector('#sendNew').focus();
+}
+
+/* snap viewer for received clips */
+async function openSnaps(person, replay) {
+  const mine = M.received.filter(x => x.from === person).sort((a, b) => a.ts - b.ts);
+  let list = replay ? mine.slice(-1) : mine.filter(x => !x.opened);
+  if (!list.length) list = mine.slice(-1);
+  const name = (mine[0] && (mine[0].fromName || mine[0].from)) || person;
+  if (!list.length) { openQuick(); S.quick.to = name; return; }
+  const d = document.createElement('div'); d.className = 'snapv';
+  d.innerHTML = `<div class="bars">${list.map(() => '<i><b></b></i>').join('')}</div>
+    <div class="head"><span class="av" style="background:${hue(name)}">${esc(initials(name))}</span><span><b>${esc(name)}</b><span id="snMeta"></span></span>
+      <span style="flex:1"></span><button class="fb" data-sn="save" aria-label="Save to Library">${I.save}</button><button class="fb" data-sn="x" aria-label="Close">×</button></div>
+    <div id="snBody"></div>`;
+  document.body.appendChild(d);
+  let i = 0, raf = 0, cur = null, timer = null, urls = [];
+  const bars = [...d.querySelectorAll('.bars b')];
+  const close = () => { cancelAnimationFrame(raf); clearTimeout(timer); urls.forEach(u => URL.revokeObjectURL(u)); d.remove(); refreshInbox(true); };
+  const done = () => {
+    cancelAnimationFrame(raf);
+    const r = document.createElement('div'); r.className = 'rsheet';
+    r.innerHTML = `<div class="mh" style="padding:0">Reply to ${esc(name)}</div>
+      <div class="chips2">${['Got it 👍', 'Looks good!', 'Try it again', 'Can you film it closer?'].map(q => `<button data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>
+      <button class="bigbtn" data-rc>${I.send}Reply with a clip</button><button class="bigbtn ghost" data-again>Watch again</button>`;
+    r.querySelectorAll('[data-q]').forEach(b => b.onclick = async () => { close(); await sendToFriend(name, null, b.dataset.q); });
+    r.querySelector('[data-rc]').onclick = () => { close(); openQuick(); S.quick.to = name; };
+    r.querySelector('[data-again]').onclick = () => { r.remove(); show(0); };
+    d.appendChild(r);
+  };
+  async function show(k) {
+    cancelAnimationFrame(raf); clearTimeout(timer); i = k; cur = list[i];
+    bars.forEach((b, j) => b.style.width = j < i ? '100%' : '0%');
+    d.querySelector('#snMeta').textContent = ago(cur.ts) === 'now' ? 'just now' : ago(cur.ts) + ' ago';
+    const body = d.querySelector('#snBody');
+    if (!cur.opened) api('/opened?id=' + cur.id, { method:'POST' }).catch(() => {}), cur.opened = true;
+    if (!cur.size) {                                      // a text reply
+      body.innerHTML = `<div class="textonly">${esc(cur.note)}</div>`;
+      const t0 = performance.now();
+      const tick = () => { const p = Math.min(1, (performance.now() - t0) / 2500); bars[i].style.width = p * 100 + '%'; if (p < 1) raf = requestAnimationFrame(tick); else next(); };
+      raf = requestAnimationFrame(tick); return;
+    }
+    body.innerHTML = `<div class="loading">Loading…</div>`;
+    try {
+      if (!cur.url) { const r = await api('/clip?id=' + cur.id); cur.blob = await r.blob(); cur.url = URL.createObjectURL(cur.blob); urls.push(cur.url); }
+    } catch (e) { body.innerHTML = `<div class="loading">This clip has expired</div>`; timer = setTimeout(next, 1500); return; }
+    if (list[i] !== cur) return;
+    body.innerHTML = `<video src="${cur.url}" autoplay playsinline></video>${cur.note ? `<div class="note-card">${esc(cur.note)}</div>` : ''}`;
+    const v = body.querySelector('video');
+    v.play().catch(() => { v.muted = true; v.play().catch(() => {}); });
+    const tick = () => { if (v.duration) bars[i].style.width = (v.currentTime / v.duration * 100) + '%'; raf = requestAnimationFrame(tick); };
+    raf = requestAnimationFrame(tick);
+    v.onended = next;
+  }
+  const next = () => { if (i < list.length - 1) show(i + 1); else { bars[i].style.width = '100%'; done(); } };
+  const prev = () => show(Math.max(0, i - 1));
+  d.querySelector('[data-sn=x]').onclick = close;
+  d.querySelector('[data-sn=save]').onclick = async () => {
+    if (!cur || !cur.blob) { toast('Nothing to save yet'); return; }
+    await addTake({ strokeId:'quick', label:'From ' + name + (cur.note ? ' · ' + cur.note : ''), blob:cur.blob, dur:0, quick:true });
+    toast('Saved to Library');
+  };
+  // tap right = next, tap left = back, hold = pause
+  let holdT = null, held = false;
+  d.addEventListener('pointerdown', e => { if (e.target.closest('button,.rsheet')) return; held = false; holdT = setTimeout(() => { held = true; const v = d.querySelector('video'); v && v.pause(); }, 220); });
+  d.addEventListener('pointerup', e => {
+    if (e.target.closest('button,.rsheet')) return; clearTimeout(holdT);
+    const v = d.querySelector('video');
+    if (held) { v && v.play(); return; }
+    if (d.querySelector('.rsheet')) return;
+    e.clientX < innerWidth / 3 ? prev() : next();
+  });
+  show(0);
+}
+
 /* ═════════ menus ═════════ */
 function menuHtml() {
   const m = S.menu, name = esc(m.name);
@@ -950,7 +1184,7 @@ function menuHtml() {
 function render() {
   const app = document.getElementById('app'), layer = document.getElementById('layer');
   const scroll = app.querySelector('.body') ? app.querySelector('.body').scrollTop : 0;
-  app.innerHTML = S.tab === 'record' ? recordScreen() : S.tab === 'library' ? libraryScreen() : linkScreen();
+  app.innerHTML = S.tab === 'record' ? recordScreen() : S.tab === 'library' ? libraryScreen() : S.tab === 'inbox' ? inboxScreen() : S.tab === 'me' ? meScreen() : linkScreen();
   const b = app.querySelector('.body'); if (b) b.scrollTop = scroll;
   const liveBefore = !!layer.querySelector('video.live');
   layer.innerHTML = (S.cam ? camHtml() : '') + (S.quick ? quickHtml() : '') + (S.player ? playerHtml() : '') + (S.menu ? menuHtml() : '');
@@ -959,7 +1193,7 @@ function render() {
 }
 function wire() {
   const $$ = s => document.querySelectorAll(s);
-  $$('[data-tab]').forEach(b => b.onclick = () => { S.tab = b.dataset.tab; S.sel = null; S.delSure = false; S.clearSure = false; render(); });
+  $$('[data-tab]').forEach(b => b.onclick = () => { S.tab = b.dataset.tab; S.sel = null; S.delSure = false; S.clearSure = false; render(); pollInbox(); if (S.tab === 'inbox') refreshInbox(true); });
   // record tab button: tap = picker, hold = quick camera
   const mid = document.getElementById('midBtn');
   if (mid) {
@@ -969,6 +1203,25 @@ function wire() {
     mid.onpointerleave = mid.onpointercancel = () => { if (tm) { clearTimeout(tm); tm = null; } };
     mid.oncontextmenu = e => e.preventDefault();
   }
+  // inbox / me
+  $$('[data-person]').forEach(b => b.onclick = () => {
+    const p = b.dataset.person, fresh = M.received.some(x => x.from === p && !x.opened), any = M.received.some(x => x.from === p);
+    if (fresh || any) openSnaps(p, !fresh); else { openQuick(); const f = M.friends.find(x => nk(x) === p); S.quick.to = f || p; }
+  });
+  $$('[data-ib=refresh]').forEach(b => b.onclick = () => refreshInbox(false));
+  $$('[data-me]').forEach(b => b.onclick = async () => {
+    const a = b.dataset.me;
+    if (a === 'save') { const v = document.getElementById('meName').value.trim().slice(0, 24); if (!v) return;
+      M.me = v; LSset('smaesh_me', v); toast('You are ' + v); M.loaded = false; render(); refreshInbox(false); }
+    else if (a === 'friend') { const v = document.getElementById('friendName').value.trim(); if (!v) return; addFriend(v); render(); toast('Added ' + v); }
+    else if (a === 'server') { const v = document.getElementById('serverUrl').value.trim(); if (!/^https:\/\//.test(v)) { toast('Use an https:// address'); return; }
+      M.server = v; LSset('smaesh_server', v); toast('Server saved'); }
+    else if (a === 'test') {
+      try { const j = await api('/'); toast(j.clips ? 'Connected · clip storage ready' : 'Connected, but clip storage (KV) is not set up yet'); }
+      catch (e) { toast('Can\'t reach the server: ' + e.message); }
+    }
+  });
+  $$('[data-unfriend]').forEach(b => b.onclick = () => { M.friends = M.friends.filter(f => f !== b.dataset.unfriend); LSset('smaesh_friends', M.friends); render(); });
   // record: categories, add, hold to rename/delete
   $$('[data-open]').forEach(b => b.onclick = () => { S.open = S.open === b.dataset.open ? null : b.dataset.open; S.adding = null; render(); });
   $$('[data-add]').forEach(b => b.onclick = () => { S.adding = b.dataset.add; render(); });
@@ -1099,19 +1352,13 @@ function wire() {
     if (a === 'back') { stopStream(); S.quick = null; render(); }
     else if (a === 'discard') { if (!S.quick.saved) toast('Discarded'); quickReset(); }
     else if (a === 'save') { await quickSave(); toast('Saved to Library'); }
-    else if (a === 'send') {
-      // any contact on the phone: Messages, Snapchat, WhatsApp… via the share sheet
-      const q = S.quick;
-      const file = new File([q.blob], `smaesh-${stamp(new Date())}.${(q.blob.type || '').includes('mp4') ? 'mp4' : 'webm'}`, { type:q.blob.type || 'video/mp4' });
-      if (navigator.canShare && navigator.canShare({ files:[file] })) {
-        try { await navigator.share({ files:[file] }); toast('Sent'); quickReset(); } catch (e) { if (e.name !== 'AbortError') toast('Sending failed'); }
-      } else toast('Sending needs the phone app');
-    }
+    else if (a === 'send') { const q = S.quick; openSendSheet(q.blob, q.to, () => { if (S.quick === q) quickReset(); }); }
   });
 }
 window.addEventListener('pointerup', () => { if (S.quick && S.quick.rec) quickStop(); });
 window.addEventListener('pointercancel', () => { if (S.quick && S.quick.rec) quickStop(); });
 document.addEventListener('visibilitychange', () => {
+  pollInbox(); if (document.visibilityState === 'visible') refreshInbox(true);
   // the camera doesn't survive the app going to the background: stop cleanly
   if (document.visibilityState === 'hidden') {
     if (S.cam && S.cam.rec) camShutter();
@@ -1135,6 +1382,7 @@ if ('serviceWorker' in navigator) {
 }
 render();
 loadTakes();
+refreshInbox(true);
 </script>
 </body>
 </html>

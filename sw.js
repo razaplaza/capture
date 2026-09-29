@@ -1,7 +1,7 @@
 // Smæsh offline support.
 // The page itself is fetched network-first so every launch with signal gets
 // the newest app; the cached copy is only used when there is no connection.
-const CACHE = 'smaesh-capture-v5';
+const CACHE = 'smaesh-capture-v6';
 const ASSETS = ['./capture.html', './manifest.webmanifest', './icon-180.png'];
 
 self.addEventListener('install', e => {
