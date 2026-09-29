@@ -1,5 +1,5 @@
 // offline cache so Smæsh opens and records with no signal at the club
-const CACHE = 'smaesh-capture-v3';
+const CACHE = 'smaesh-capture-v4';
 const ASSETS = ['./capture.html', './manifest.webmanifest', './icon-180.png'];
 
 self.addEventListener('install', e => {

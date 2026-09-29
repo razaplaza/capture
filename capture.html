@@ -163,55 +163,67 @@
   .menu input { background:#0d1116; border:1px solid var(--teal); border-radius:14px; padding:15px; color:var(--ink); font-size:17px; font-weight:600; outline:none; text-align:center;
                 user-select:text; -webkit-user-select:text; }
 
-  /* ═════ review player + compare ═════ */
-  .rv { position:fixed; inset:0; z-index:35; background:#000; display:flex; flex-direction:column; touch-action:none; }
-  .rv-top { position:absolute; left:0; right:0; top:0; z-index:3; padding:calc(var(--st) + 10px) 12px 26px; display:flex; align-items:center; gap:8px;
-            background:linear-gradient(rgba(0,0,0,.6), transparent); }
-  .rv-name { position:absolute; left:12px; top:calc(var(--st) + 62px); max-width:calc(100vw - 24px) !important; }
-  .rv-top .pill { max-width:42vw; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .rv-nav { display:flex; align-items:center; border-radius:10px; background:rgba(17,22,28,.8); border:1px solid var(--edge); }
-  .rv-nav button { width:34px; height:40px; display:grid; place-items:center; color:var(--ink); }
-  .rv-nav button:disabled { color:#3a4652; }
-  .rv-nav span { font-family:var(--mono); font-size:12.5px; min-width:44px; text-align:center; }
-  .rv-top .sp { flex:1; }
-  .rv-cmp { display:flex; align-items:center; gap:6px; height:42px; padding:0 12px; border-radius:12px; background:var(--teal); color:#062825; font-weight:700; font-size:14px; }
-  .rv-cmp svg { width:18px; height:18px; }
-  .rv-stage { position:relative; flex:1; min-height:0; overflow:hidden; }
+  /* ═════ review player + compare: full-bleed video, floating glass controls ═════ */
+  .rv { position:fixed; inset:0; z-index:35; background:#000; touch-action:none; overflow:hidden;
+        --sl:env(safe-area-inset-left, 0px); --sr:env(safe-area-inset-right, 0px); }
+  .rv-stage { position:absolute; inset:0; overflow:hidden; }
   .rv-stage video { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; transform-origin:0 0; will-change:transform; }
-  .rv-hud { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:2; pointer-events:none; font-family:var(--mono); font-weight:600;
-            background:rgba(0,0,0,.6); padding:8px 14px; border-radius:12px; font-size:16px; opacity:0; transition:opacity .2s; }
+  .fl { position:absolute; z-index:3; display:flex; align-items:center; gap:8px; pointer-events:none; }
+  .fl > * { pointer-events:auto; }
+  .fl.tl { top:calc(var(--st) + 10px); left:calc(var(--sl) + 10px); }
+  .fl.tr { top:calc(var(--st) + 10px); right:calc(var(--sr) + 10px); }
+  .fl.bl { bottom:calc(var(--sb) + 46px); left:calc(var(--sl) + 10px); }
+  .fl.br { bottom:calc(var(--sb) + 46px); right:calc(var(--sr) + 10px); }
+  .fb { width:44px; height:44px; border-radius:50%; display:grid; place-items:center; color:#fff;
+        background:rgba(10,12,15,.38); border:1px solid rgba(255,255,255,.14); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
+  .fb svg { width:20px; height:20px; }
+  .fb.txt { width:auto; min-width:44px; padding:0 12px; border-radius:22px; font-family:var(--mono); font-size:13px; font-weight:600; }
+  .fb.on { background:rgba(63,210,199,.85); color:#062825; border-color:transparent; }
+  .fb.half { border-color:var(--teal); color:var(--teal); }
+  .fb.warn { color:var(--danger); }
+  .fb.sure { background:var(--danger); color:#1a0505; width:auto; padding:0 12px; border-radius:22px; font-weight:700; font-size:13px; }
+  .fchip { height:32px; display:flex; align-items:center; padding:0 11px; border-radius:16px; font-size:12.5px; font-weight:700; color:#fff;
+           background:rgba(10,12,15,.38); border:1px solid rgba(255,255,255,.14); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+           max-width:46vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  @media (orientation: portrait) { #rvLabel { position:absolute; left:0; top:52px; max-width:calc(100vw - 20px); } }
+  .fchip.nav { padding:0; gap:0; } .fchip.nav button { width:32px; height:32px; display:grid; place-items:center; color:#fff; }
+  .fchip.nav button:disabled { opacity:.3; } .fchip.nav span { font-family:var(--mono); font-size:12px; min-width:36px; text-align:center; }
+  .fchip.nav svg { width:18px; height:18px; }
+  .rv-hud { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:4; pointer-events:none; font-family:var(--mono); font-weight:600;
+            background:rgba(0,0,0,.55); padding:7px 13px; border-radius:12px; font-size:14px; opacity:0; transition:opacity .2s; }
   .rv-hud.show { opacity:1; }
-  .rv-dock { flex-shrink:0; background:#0d1116; border-top:1px solid var(--line); padding:12px 14px calc(var(--sb) + 12px); display:flex; flex-direction:column; gap:12px; }
-  .jog { position:relative; height:44px; border-radius:12px; background:#141b22; border:1px solid var(--edge); overflow:hidden; touch-action:none; }
-  .jog .ticks { position:absolute; inset:0; background:repeating-linear-gradient(90deg, rgba(255,255,255,.08) 0 1px, transparent 1px 12px); }
-  .jog .ab { position:absolute; top:0; bottom:0; background:rgba(63,210,199,.18); border-left:2px solid var(--teal); border-right:2px solid var(--teal); display:none; }
-  .jog .fill { position:absolute; left:0; top:0; bottom:0; background:rgba(63,210,199,.12); }
-  .jog .head { position:absolute; top:4px; bottom:4px; width:3px; margin-left:-1.5px; border-radius:2px; background:var(--teal); box-shadow:0 0 10px rgba(63,210,199,.7); }
-  .jog .tl { position:absolute; right:10px; top:50%; transform:translateY(-50%); font-family:var(--mono); font-size:12px; color:var(--mute); pointer-events:none; }
-  .jog .tl b { color:var(--ink); font-weight:500; }
-  .rv-row { display:flex; align-items:center; justify-content:space-between; gap:6px; }
-  .rb { height:48px; min-width:48px; border-radius:14px; background:var(--card); border:1px solid var(--edge); display:grid; place-items:center; font-weight:700; font-size:14px; padding:0 10px; }
-  .rb svg { width:22px; height:22px; }
-  .rb.play { width:64px; height:56px; border-radius:18px; background:var(--teal); color:#062825; border-color:var(--teal); }
-  .rb.on { background:var(--teal); color:#062825; border-color:var(--teal); }
-  .rb.mono { font-family:var(--mono); font-size:13px; }
-  .rb.ab.half { border-color:var(--teal); color:var(--teal); }
-  /* compare */
-  .cp-panes { position:relative; flex:1; min-height:0; display:flex; flex-direction:column; gap:3px; padding-top:calc(var(--st) + 58px); }
-  .cp-pane { position:relative; flex:1; min-height:0; overflow:hidden; background:#000; outline:2px solid transparent; outline-offset:-2px; }
+  /* thin timeline pinned to the bottom edge */
+  .jog { position:absolute; z-index:3; left:calc(var(--sl) + 10px); right:calc(var(--sr) + 10px); bottom:calc(var(--sb) + 8px); height:28px;
+         border-radius:14px; overflow:hidden; touch-action:none; background:rgba(10,12,15,.42); border:1px solid rgba(255,255,255,.12);
+         backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
+  .jog .ticks { position:absolute; inset:0; background:repeating-linear-gradient(90deg, rgba(255,255,255,.07) 0 1px, transparent 1px 10px); }
+  .jog .ab { position:absolute; top:0; bottom:0; background:rgba(63,210,199,.22); border-left:2px solid var(--teal); border-right:2px solid var(--teal); display:none; }
+  .jog .fill { position:absolute; left:0; top:0; bottom:0; background:rgba(63,210,199,.16); }
+  .jog .head { position:absolute; top:3px; bottom:3px; width:3px; margin-left:-1.5px; border-radius:2px; background:var(--teal); box-shadow:0 0 8px rgba(63,210,199,.8); }
+  .jog .tl { position:absolute; right:10px; top:50%; transform:translateY(-50%); font-family:var(--mono); font-size:11px; color:rgba(255,255,255,.65); pointer-events:none; }
+  .jog .tl b { color:#fff; font-weight:500; }
+  /* compare: stacked in portrait, side by side when the phone is sideways */
+  .cp-panes { position:absolute; inset:0; display:flex; flex-direction:column; gap:2px; }
+  @media (orientation: landscape) { .cp-panes { flex-direction:row; } }
+  .cp-pane { position:relative; flex:1; min-height:0; min-width:0; overflow:hidden; background:#000; outline:2px solid transparent; outline-offset:-2px; }
   .cp-pane.act { outline-color:var(--teal); }
   .cp-pane video { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; }
-  .cp-pane .tag { position:absolute; left:10px; top:10px; z-index:2; max-width:70%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .cp-pane .off { position:absolute; right:10px; top:10px; z-index:2; font-family:var(--mono); font-size:12px; }
-  .cp-panes.ghost .cp-pane.b { position:absolute; inset:calc(var(--st) + 58px) 0 0 0; background:transparent; }
+  .cp-pane .tag { position:absolute; left:calc(var(--sl) + 10px); bottom:calc(50% - 16px); z-index:2; opacity:.9; }
+  .cp-pane.a .tag { top:calc(var(--st) + 60px); bottom:auto; } .cp-pane.b .tag { top:10px; bottom:auto; }
+  @media (orientation: landscape) { .cp-pane .tag, .cp-pane.a .tag, .cp-pane.b .tag { top:calc(var(--st) + 60px); } }
+  .cp-pane .off { position:absolute; right:10px; top:10px; z-index:2; font-family:var(--mono); }
+  @media (orientation: landscape) { .cp-pane .off { top:calc(var(--st) + 60px); } }
+  .cp-panes.ghost .cp-pane.b { position:absolute; inset:0; background:transparent; outline:none; }
   .cp-panes.ghost .cp-pane.b video { opacity:var(--ghost, .5); }
-  .cp-panes.ghost .cp-pane.a { flex:1; }
-  .slider { display:flex; align-items:center; gap:10px; font-size:12.5px; color:var(--mute); }
+  .cp-panes.ghost .cp-pane.b .tag { display:none; }
+  .slider { position:absolute; z-index:3; left:50%; transform:translateX(-50%); bottom:calc(var(--sb) + 50px); width:min(46vw, 260px);
+            display:flex; align-items:center; gap:8px; font-size:11px; color:#fff; padding:6px 12px; border-radius:18px;
+            background:rgba(10,12,15,.42); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
   .slider input { flex:1; accent-color:var(--teal); }
   .pick { position:fixed; inset:0; z-index:45; background:rgba(5,8,10,.6); display:flex; flex-direction:column; justify-content:flex-end; }
   .pick .sheet { max-height:78vh; }
   .pick .grid { overflow-y:auto; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
-
+  @media (orientation: landscape) { .pick .grid { grid-template-columns:repeat(5,minmax(0,1fr)); } }
   .toast { position:fixed; left:50%; top:calc(var(--st) + 70px); transform:translateX(-50%); z-index:60; background:var(--ink); color:#0d1116; font-weight:600;
            font-size:14px; padding:10px 17px; border-radius:999px; white-space:nowrap; max-width:92vw; overflow:hidden; text-overflow:ellipsis; pointer-events:none; }
   @media (prefers-reduced-motion: reduce) { * { animation:none !important; transition:none !important; } }
@@ -719,23 +731,20 @@ function openReview(list, i) {
   RV.list = list; RV.i = i; RV.ab = null;
   const root = rvEl();
   root.innerHTML = `<div class="rv" id="rv">
-    <div class="rv-top"><button class="cbtn" data-rv="close" aria-label="Back">${I.back}</button>
-      <span class="pill label rv-name" id="rvLabel"></span><span class="sp"></span>
-      <span class="rv-nav"><button data-rv="prev" aria-label="Previous clip">${I.chevL}</button><span id="rvIdx"></span><button data-rv="next" aria-label="Next clip">${I.chevR}</button></span>
-      <button class="rv-cmp" data-rv="cmp">${I.cmp}Compare</button></div>
-    <div class="rv-stage" id="rvStage"><video id="rvVid" playsinline autoplay loop></video><div class="rv-hud"></div></div>
-    <div class="rv-dock">
-      <div class="jog" id="rvJog"><div class="ticks"></div><div class="ab" id="rvAb"></div><div class="fill" id="rvFill"></div><div class="head" id="rvHead"></div>
-        <div class="tl"><b id="rvCur">0:00.00</b> / <span id="rvDur"></span></div></div>
-      <div class="rv-row">
-        <button class="rb mono" data-rv="rate" id="rvRate">1×</button>
-        <button class="rb" id="rvFb" aria-label="Back one frame">${I.fb}</button>
-        <button class="rb play" data-rv="play" id="rvPlay" aria-label="Play or pause">${I.pause}</button>
-        <button class="rb" id="rvFf" aria-label="Forward one frame">${I.ff}</button>
-        <button class="rb ab" data-rv="ab" id="rvAbBtn">A–B</button>
-      </div>
-      <div class="rv-row"><button class="rb" data-rv="share" style="flex:1;display:flex;gap:8px;justify-content:center" id="rvShare"></button><button class="rb" data-rv="del" id="rvDel" style="color:var(--danger)">${I.trash}</button></div>
-    </div></div>`;
+    <div class="rv-stage" id="rvStage"><video id="rvVid" playsinline autoplay loop></video></div>
+    <div class="rv-hud"></div>
+    <div class="fl tl"><button class="fb" data-rv="close" aria-label="Back">${I.back}</button><span class="fchip" id="rvLabel"></span></div>
+    <div class="fl tr">
+      <span class="fchip nav"><button data-rv="prev" aria-label="Previous clip">${I.chevL}</button><span id="rvIdx"></span><button data-rv="next" aria-label="Next clip">${I.chevR}</button></span>
+      <button class="fb" data-rv="cmp" aria-label="Compare">${I.cmp}</button>
+      <button class="fb" data-rv="share" id="rvShare" aria-label="Upload">${I.cloud}</button>
+      <button class="fb warn" data-rv="del" id="rvDel" aria-label="Delete">${I.trash}</button></div>
+    <div class="fl bl"><button class="fb" data-rv="play" id="rvPlay" aria-label="Play or pause">${I.pause}</button>
+      <button class="fb" id="rvFb" aria-label="Back one frame">${I.fb}</button><button class="fb" id="rvFf" aria-label="Forward one frame">${I.ff}</button></div>
+    <div class="fl br"><button class="fb txt" data-rv="rate" id="rvRate">1×</button><button class="fb txt" data-rv="ab" id="rvAbBtn">A–B</button></div>
+    <div class="jog" id="rvJog"><div class="ticks"></div><div class="ab" id="rvAb"></div><div class="fill" id="rvFill"></div><div class="head" id="rvHead"></div>
+      <div class="tl"><b id="rvCur">0:00.00</b> / <span id="rvDur"></span></div></div>
+  </div>`;
   const v = root.querySelector('#rvVid');
   const ctl = {
     time: () => v.currentTime, pause: () => { v.pause(); syncPlay(); },
@@ -777,8 +786,8 @@ function loadRV() {
   root.querySelector('#rvIdx').textContent = `${RV.i + 1}/${RV.list.length}`;
   root.querySelector('[data-rv=prev]').disabled = RV.i === 0;
   root.querySelector('[data-rv=next]').disabled = RV.i === RV.list.length - 1;
-  root.querySelector('#rvShare').innerHTML = `${I.cloud}&nbsp;${t.sync === 'sent' ? 'Send again' : 'Upload'}`;
-  root.querySelector('#rvDel').innerHTML = I.trash; RV.delSure = false;
+  root.querySelector('#rvShare').classList.toggle('on', t.sync === 'sent');
+  const del = root.querySelector('#rvDel'); del.innerHTML = I.trash; del.classList.remove('sure'); RV.delSure = false;
   drawAb();
 }
 function drawAb() {
@@ -810,7 +819,7 @@ async function rvAction(a) {
   else if (a === 'share') { if (await shareTakes([t])) { toast('Uploaded'); loadRV(); render(); } }
   else if (a === 'del') {
     const b = root.querySelector('#rvDel');
-    if (!RV.delSure) { RV.delSure = true; b.textContent = 'Delete?'; return; }
+    if (!RV.delSure) { RV.delSure = true; b.textContent = 'Delete?'; b.classList.add('sure'); return; }
     await dbDel(t.id); S.takes = S.takes.filter(x => x.id !== t.id); RV.list.splice(RV.i, 1);
     toast('Deleted'); render();
     if (!RV.list.length) closeReview(); else { RV.i = Math.min(RV.i, RV.list.length - 1); loadRV(); }
@@ -843,24 +852,21 @@ function openCompare(a, b) {
   Object.assign(CP, { a, b, act:'a', link:true, off:0, ghost:false });
   const root = rvEl();
   root.innerHTML = `<div class="rv" id="cp">
-    <div class="rv-top"><button class="cbtn" data-cp="close" aria-label="Back">${I.back}</button><span class="sp"></span>
-      <button class="rb" data-cp="swap" style="height:42px" aria-label="Swap">${I.swap}</button>
-      <button class="rb" data-cp="ghost" id="cpGhost" style="height:42px" aria-label="Overlay">${I.ghost}</button></div>
     <div class="cp-panes" id="cpPanes">
-      <div class="cp-pane a act" data-pane="a"><video playsinline muted loop></video><span class="pill label tag"></span></div>
-      <div class="cp-pane b" data-pane="b"><video playsinline muted loop></video><span class="pill tag"></span><span class="pill off" id="cpOff"></span></div>
-      <div class="rv-hud"></div></div>
-    <div class="rv-dock">
-      <div class="slider" id="cpSlide" hidden>A<input type="range" min="10" max="90" value="50" id="cpOpacity" aria-label="Overlay opacity">B</div>
-      <div class="jog" id="cpJog"><div class="ticks"></div><div class="fill" id="cpFill"></div><div class="head" id="cpHead"></div>
-        <div class="tl"><b id="cpCur">0:00.00</b> <span id="cpWho"></span></div></div>
-      <div class="rv-row">
-        <button class="rb mono" data-cp="rate" id="cpRate">1×</button>
-        <button class="rb" id="cpFb" aria-label="Back one frame">${I.fb}</button>
-        <button class="rb play" data-cp="play" id="cpPlay" aria-label="Play or pause">${I.play}</button>
-        <button class="rb" id="cpFf" aria-label="Forward one frame">${I.ff}</button>
-        <button class="rb on" data-cp="link" id="cpLink" aria-label="Link both clips">${I.linkOn}</button>
-      </div></div></div>`;
+      <div class="cp-pane a" data-pane="a"><video playsinline muted loop></video><span class="fchip tag"></span></div>
+      <div class="cp-pane b" data-pane="b"><video playsinline muted loop></video><span class="fchip tag"></span><span class="fchip off" id="cpOff"></span></div></div>
+    <div class="rv-hud"></div>
+    <div class="fl tl"><button class="fb" data-cp="close" aria-label="Back">${I.back}</button></div>
+    <div class="fl tr"><button class="fb" data-cp="swap" aria-label="Swap">${I.swap}</button>
+      <button class="fb" data-cp="ghost" id="cpGhost" aria-label="Overlay">${I.ghost}</button></div>
+    <div class="fl bl"><button class="fb" data-cp="play" id="cpPlay" aria-label="Play or pause">${I.play}</button>
+      <button class="fb" id="cpFb" aria-label="Back one frame">${I.fb}</button><button class="fb" id="cpFf" aria-label="Forward one frame">${I.ff}</button></div>
+    <div class="fl br"><button class="fb txt" data-cp="rate" id="cpRate">1×</button>
+      <button class="fb on" data-cp="link" id="cpLink" aria-label="Link both clips">${I.linkOn}</button></div>
+    <div class="slider" id="cpSlide" hidden>A<input type="range" min="10" max="90" value="50" id="cpOpacity" aria-label="Overlay opacity">B</div>
+    <div class="jog" id="cpJog"><div class="ticks"></div><div class="fill" id="cpFill"></div><div class="head" id="cpHead"></div>
+      <div class="tl"><b id="cpCur">0:00.00</b> <span id="cpWho"></span></div></div>
+  </div>`;
   const va = root.querySelector('[data-pane=a] video'), vb = root.querySelector('[data-pane=b] video');
   const vids = { a:va, b:vb };
   const load = () => {
