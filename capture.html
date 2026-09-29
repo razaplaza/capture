@@ -162,6 +162,56 @@
   .act.danger { color:var(--danger); } .act.primary { background:var(--teal); color:#062825; border-color:var(--teal); } .act.plain { background:none; border-color:transparent; color:var(--mute); }
   .menu input { background:#0d1116; border:1px solid var(--teal); border-radius:14px; padding:15px; color:var(--ink); font-size:17px; font-weight:600; outline:none; text-align:center;
                 user-select:text; -webkit-user-select:text; }
+
+  /* ═════ review player + compare ═════ */
+  .rv { position:fixed; inset:0; z-index:35; background:#000; display:flex; flex-direction:column; touch-action:none; }
+  .rv-top { position:absolute; left:0; right:0; top:0; z-index:3; padding:calc(var(--st) + 10px) 12px 26px; display:flex; align-items:center; gap:8px;
+            background:linear-gradient(rgba(0,0,0,.6), transparent); }
+  .rv-name { position:absolute; left:12px; top:calc(var(--st) + 62px); max-width:calc(100vw - 24px) !important; }
+  .rv-top .pill { max-width:42vw; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .rv-nav { display:flex; align-items:center; border-radius:10px; background:rgba(17,22,28,.8); border:1px solid var(--edge); }
+  .rv-nav button { width:34px; height:40px; display:grid; place-items:center; color:var(--ink); }
+  .rv-nav button:disabled { color:#3a4652; }
+  .rv-nav span { font-family:var(--mono); font-size:12.5px; min-width:44px; text-align:center; }
+  .rv-top .sp { flex:1; }
+  .rv-cmp { display:flex; align-items:center; gap:6px; height:42px; padding:0 12px; border-radius:12px; background:var(--teal); color:#062825; font-weight:700; font-size:14px; }
+  .rv-cmp svg { width:18px; height:18px; }
+  .rv-stage { position:relative; flex:1; min-height:0; overflow:hidden; }
+  .rv-stage video { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; transform-origin:0 0; will-change:transform; }
+  .rv-hud { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:2; pointer-events:none; font-family:var(--mono); font-weight:600;
+            background:rgba(0,0,0,.6); padding:8px 14px; border-radius:12px; font-size:16px; opacity:0; transition:opacity .2s; }
+  .rv-hud.show { opacity:1; }
+  .rv-dock { flex-shrink:0; background:#0d1116; border-top:1px solid var(--line); padding:12px 14px calc(var(--sb) + 12px); display:flex; flex-direction:column; gap:12px; }
+  .jog { position:relative; height:44px; border-radius:12px; background:#141b22; border:1px solid var(--edge); overflow:hidden; touch-action:none; }
+  .jog .ticks { position:absolute; inset:0; background:repeating-linear-gradient(90deg, rgba(255,255,255,.08) 0 1px, transparent 1px 12px); }
+  .jog .ab { position:absolute; top:0; bottom:0; background:rgba(63,210,199,.18); border-left:2px solid var(--teal); border-right:2px solid var(--teal); display:none; }
+  .jog .fill { position:absolute; left:0; top:0; bottom:0; background:rgba(63,210,199,.12); }
+  .jog .head { position:absolute; top:4px; bottom:4px; width:3px; margin-left:-1.5px; border-radius:2px; background:var(--teal); box-shadow:0 0 10px rgba(63,210,199,.7); }
+  .jog .tl { position:absolute; right:10px; top:50%; transform:translateY(-50%); font-family:var(--mono); font-size:12px; color:var(--mute); pointer-events:none; }
+  .jog .tl b { color:var(--ink); font-weight:500; }
+  .rv-row { display:flex; align-items:center; justify-content:space-between; gap:6px; }
+  .rb { height:48px; min-width:48px; border-radius:14px; background:var(--card); border:1px solid var(--edge); display:grid; place-items:center; font-weight:700; font-size:14px; padding:0 10px; }
+  .rb svg { width:22px; height:22px; }
+  .rb.play { width:64px; height:56px; border-radius:18px; background:var(--teal); color:#062825; border-color:var(--teal); }
+  .rb.on { background:var(--teal); color:#062825; border-color:var(--teal); }
+  .rb.mono { font-family:var(--mono); font-size:13px; }
+  .rb.ab.half { border-color:var(--teal); color:var(--teal); }
+  /* compare */
+  .cp-panes { position:relative; flex:1; min-height:0; display:flex; flex-direction:column; gap:3px; padding-top:calc(var(--st) + 58px); }
+  .cp-pane { position:relative; flex:1; min-height:0; overflow:hidden; background:#000; outline:2px solid transparent; outline-offset:-2px; }
+  .cp-pane.act { outline-color:var(--teal); }
+  .cp-pane video { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; }
+  .cp-pane .tag { position:absolute; left:10px; top:10px; z-index:2; max-width:70%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .cp-pane .off { position:absolute; right:10px; top:10px; z-index:2; font-family:var(--mono); font-size:12px; }
+  .cp-panes.ghost .cp-pane.b { position:absolute; inset:calc(var(--st) + 58px) 0 0 0; background:transparent; }
+  .cp-panes.ghost .cp-pane.b video { opacity:var(--ghost, .5); }
+  .cp-panes.ghost .cp-pane.a { flex:1; }
+  .slider { display:flex; align-items:center; gap:10px; font-size:12.5px; color:var(--mute); }
+  .slider input { flex:1; accent-color:var(--teal); }
+  .pick { position:fixed; inset:0; z-index:45; background:rgba(5,8,10,.6); display:flex; flex-direction:column; justify-content:flex-end; }
+  .pick .sheet { max-height:78vh; }
+  .pick .grid { overflow-y:auto; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
+
   .toast { position:fixed; left:50%; top:calc(var(--st) + 70px); transform:translateX(-50%); z-index:60; background:var(--ink); color:#0d1116; font-weight:600;
            font-size:14px; padding:10px 17px; border-radius:999px; white-space:nowrap; max-width:92vw; overflow:hidden; text-overflow:ellipsis; pointer-events:none; }
   @media (prefers-reduced-motion: reduce) { * { animation:none !important; transition:none !important; } }
@@ -170,6 +220,7 @@
 <body>
 <div class="app" id="app"></div>
 <div id="layer"></div>
+<div id="review"></div>
 <input type="file" id="importPick" accept="video/*" hidden />
 
 <script>
@@ -252,6 +303,16 @@ const I = {
   save:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>',
   send:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>',
   lib:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="9" rx="1.5"/><rect x="3" y="15" width="7" height="6" rx="1.5"/><rect x="14" y="15" width="7" height="6" rx="1.5"/></svg>',
+  cmp:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="8" rx="1.5"/><rect x="3" y="13" width="18" height="8" rx="1.5"/></svg>',
+  play:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg>',
+  pause:'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4.5" width="4" height="15" rx="1"/><rect x="14" y="4.5" width="4" height="15" rx="1"/></svg>',
+  fb:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 17 6 12 11 7"/><line x1="18" y1="17" x2="18" y2="7"/></svg>',
+  ff:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 17 18 12 13 7"/><line x1="6" y1="17" x2="6" y2="7"/></svg>',
+  chevL:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>',
+  chevR:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>',
+  linkOn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>',
+  ghost:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="13" height="13" rx="2"/><rect x="8" y="3" width="13" height="13" rx="2" stroke-dasharray="3 3"/></svg>',
+  swap:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16M7 4 3 8M7 4l4 4M17 20V4M17 20l-4-4M17 20l4-4"/></svg>',
   link:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="12" height="9" rx="1.5"/><path d="M6 17h4M8 13v4"/><rect x="16" y="8" width="6" height="12" rx="1.5"/></svg>',
 };
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
@@ -307,13 +368,13 @@ async function loadTakes() {
     await dbPut(t); render();
   }
 }
-async function addTake({ strokeId, label, blob, dur, createdAt, quick }) {
+async function addTake({ strokeId, label, blob, dur, createdAt, quick, fps }) {
   const type = blob.type || 'video/mp4';
   const ext = /quicktime/.test(type) ? 'mov' : type.includes('mp4') ? 'mp4' : 'webm';
   const d = new Date(createdAt || Date.now());
   const sameDay = S.takes.filter(t => t.strokeId === strokeId && dayLabel(t.createdAt) === dayLabel(d.getTime())).length;
   const name = `replay~${strokeId}~${stamp(d)}~${sameDay + 1}.${ext}`;
-  const t = { id:uid(), strokeId, cat:catOfId(strokeId), label, name, blob, size:blob.size, dur:dur || 0, createdAt:d.getTime(), sync:'local', quick:!!quick };
+  const t = { id:uid(), strokeId, cat:catOfId(strokeId), label, name, blob, size:blob.size, dur:dur || 0, createdAt:d.getTime(), sync:'local', quick:!!quick, fps: fps || 0 };
   S.takes.unshift(t);
   await dbPut(t);
   makeThumb(blob).then(async th => { t.thumb = th || 'none'; await dbPut(t); if (S.tab === 'library' && !S.cam && !S.quick) render(); });
@@ -372,8 +433,9 @@ function recordScreen() {
 
 /* ═════════ library ═════════ */
 const secOf = t => STROKE.includes(t.cat) || t.cat === 'quick' ? 'strokes' : t.cat === 'match' ? 'matches' : 'drills';
+const libList = () => S.takes.filter(t => secOf(t) === S.sec && (S.sec !== 'strokes' || S.filter === 'all' || t.cat === S.filter));
 function libraryScreen() {
-  const list = S.takes.filter(t => secOf(t) === S.sec && (S.sec !== 'strokes' || S.filter === 'all' || t.cat === S.filter));
+  const list = libList();
   const count = k => S.takes.filter(t => secOf(t) === k).length;
   const n = unsent().length;
   let h = `<div class="top"><span class="word">Library</span></div><div class="body">`;
@@ -396,7 +458,8 @@ function libraryScreen() {
   h += `</div>`;
   if (S.sel) return h + `<div class="actionbar"><button data-cancel>Cancel</button>
     <button class="danger${S.delSure ? ' sure' : ''}" data-del>${S.delSure ? `Delete ${S.sel.size}?` : I.trash + S.sel.size}</button>
-    <button class="primary" data-up>${I.cloud}Upload ${S.sel.size}</button></div>`;
+    ${S.sel.size === 2 ? `<button data-cmp>${I.cmp}Compare</button>` : ''}
+    <button class="primary" data-up>${I.cloud}${S.sel.size === 2 ? '' : 'Upload '}${S.sel.size}</button></div>`;
   return h + tabs();
 }
 
@@ -442,6 +505,7 @@ async function startStream() {
     return true;
   } catch (e) { toast('Camera blocked: ' + e.message); return false; }
 }
+function streamFps() { try { return Math.round(stream.getVideoTracks()[0].getSettings().frameRate) || 0; } catch (e) { return 0; } }
 function stopStream() { if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; } if (wake) { wake.release().catch(() => {}); wake = null; } }
 function pickMime() {
   for (const m of ['video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm']) if (window.MediaRecorder && MediaRecorder.isTypeSupported(m)) return m;
@@ -486,7 +550,7 @@ function camShutter() {
   if (!c.rec) {
     try { c.recorder = makeRecorder(async blob => {
       if (!blob) return;
-      const t = await addTake({ strokeId:c.strokeId, label:c.label, blob, dur:(Date.now() - c.rec0) / 1000 });
+      const t = await addTake({ strokeId:c.strokeId, label:c.label, blob, dur:(Date.now() - c.rec0) / 1000, fps:streamFps() });
       c.takes++; toast(`Saved · ${SHORT[c.cat]} ${c.label} · take ${c.takes}`);
       const th = await makeThumb(blob); if (th && S.cam === c) { c.lastThumb = th; render(); }
     }); } catch (e) { toast('Recording not supported: ' + e.message); return; }
@@ -560,7 +624,7 @@ function quickReset() {
 }
 async function quickSave() {
   const q = S.quick; if (q.saved) return q.take;
-  q.take = await addTake({ strokeId:'quick', label:'Quick clip', blob:q.blob, dur:q.dur, quick:true });
+  q.take = await addTake({ strokeId:'quick', label:'Quick clip', blob:q.blob, dur:q.dur, quick:true, fps:streamFps() });
   q.saved = true; render(); return q.take;
 }
 
@@ -572,6 +636,297 @@ function playerHtml() {
     <video src="${blobURL(t)}" controls autoplay playsinline loop></video>
     <div class="pbar"><button class="save" data-pl="del" style="color:var(--danger)">${S.player.sure ? 'Delete?' : I.trash}</button>
       <button class="send" data-pl="share">${t.sync === 'sent' ? 'Send again' : 'Upload'} ${I.cloud}</button></div></div>`;
+}
+
+
+/* ═════════ review player ═════════
+   Lives in #review, outside render(): app redraws never restart playback.  */
+const RATES = [1, 0.5, 0.25];
+const rvEl = () => document.getElementById('review');
+const stepOf = t => 1 / (t && t.fps >= 20 ? t.fps : 30);
+let hudT = null;
+function hud(root, text) { const h = root.querySelector('.rv-hud'); if (!h) return; h.textContent = text; h.classList.add('show'); clearTimeout(hudT); hudT = setTimeout(() => h.classList.remove('show'), 700); }
+const fmtT = s => { s = Math.max(0, s || 0); return `${Math.floor(s / 60)}:${pad(Math.floor(s % 60))}.${pad(Math.floor((s % 1) * 100))}`; };
+
+// hold-to-repeat for the frame buttons
+function repeatBtn(btn, fn) {
+  let t1 = null, t2 = null;
+  const stop = () => { clearTimeout(t1); clearInterval(t2); };
+  btn.onpointerdown = e => { e.preventDefault(); fn(); t1 = setTimeout(() => { t2 = setInterval(fn, 70); }, 350); };
+  btn.onpointerup = btn.onpointerleave = btn.onpointercancel = stop;
+  btn.oncontextmenu = e => e.preventDefault();
+}
+// a jog bar: drag anywhere to seek; returns an updater for the playhead
+function jogBar(el, getDur, onSeek) {
+  const drag = e => { const r = el.getBoundingClientRect(); onSeek(Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * getDur()); };
+  el.onpointerdown = e => { el.setPointerCapture(e.pointerId); drag(e); el.onpointermove = drag; };
+  el.onpointerup = el.onpointercancel = () => { el.onpointermove = null; };
+}
+// pinch zoom + two-finger pan + one-finger horizontal jog on a stage
+function stageGestures(stage, target, opts) {
+  const pts = new Map(); let z = 1, x = 0, y = 0, g = null, lastTap = 0;
+  const apply = () => { target.forEach(v => { v.style.transform = `translate(${x}px, ${y}px) scale(${z})`; }); };
+  const reset = () => { z = 1; x = 0; y = 0; apply(); };
+  stage.onpointerdown = e => {
+    stage.setPointerCapture(e.pointerId); pts.set(e.pointerId, { x:e.clientX, y:e.clientY });
+    if (pts.size === 1) {
+      const now = Date.now();
+      if (now - lastTap < 280) { reset(); lastTap = 0; return; }
+      lastTap = now;
+      g = { mode:'one', x0:e.clientX, y0:e.clientY, t0:opts.time(), moved:false };
+    } else if (pts.size === 2) {
+      const [a, b] = [...pts.values()];
+      g = { mode:'two', d0:Math.hypot(a.x - b.x, a.y - b.y), z0:z, cx:(a.x + b.x) / 2, cy:(a.y + b.y) / 2, x0:x, y0:y };
+    }
+  };
+  stage.onpointermove = e => {
+    if (!pts.has(e.pointerId) || !g) return;
+    pts.set(e.pointerId, { x:e.clientX, y:e.clientY });
+    if (g.mode === 'one' && pts.size === 1) {
+      const dx = e.clientX - g.x0, dy = e.clientY - g.y0;
+      if (!g.moved && Math.hypot(dx, dy) < 8) return;
+      if (!g.moved) { g.moved = true; g.axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y'; if (g.axis === 'x') opts.pause(); }
+      if (g.axis === 'x') { opts.seek(g.t0 + dx / stage.clientWidth * 2); }          // one screen width = 2 s
+      else if (z === 1 && dy > 0) stage.style.transform = `translateY(${dy}px)`;       // pull down to close
+      else if (z > 1) { x += e.movementX || 0; y += e.movementY || 0; apply(); }
+    } else if (g.mode === 'two' && pts.size === 2) {
+      const [a, b] = [...pts.values()];
+      const d = Math.hypot(a.x - b.x, a.y - b.y), cx = (a.x + b.x) / 2, cy = (a.y + b.y) / 2;
+      const r = stage.getBoundingClientRect();
+      const nz = Math.max(1, Math.min(5, g.z0 * d / g.d0));
+      // keep the point between the fingers where it was
+      x = cx - r.left - (g.cx - r.left - g.x0) * nz / g.z0; y = cy - r.top - (g.cy - r.top - g.y0) * nz / g.z0; z = nz;
+      if (z === 1) { x = 0; y = 0; }
+      apply();
+    }
+  };
+  const up = e => {
+    pts.delete(e.pointerId);
+    if (g && g.mode === 'one' && g.axis === 'y' && z === 1) {
+      const dy = e.clientY - g.y0; stage.style.transform = '';
+      if (dy > 110 && opts.close) { opts.close(); return; }
+    }
+    if (g && g.mode === 'one' && !g.moved && opts.tap) setTimeout(() => { if (lastTap && Date.now() - lastTap >= 270) opts.tap(); }, 290);
+    if (pts.size === 0) g = null;
+  };
+  stage.onpointerup = up; stage.onpointercancel = up;
+  return { reset };
+}
+
+const RV = { list:[], i:0, rate:0, ab:null, raf:0 };
+function openReview(list, i) {
+  if (i < 0) return;
+  RV.list = list; RV.i = i; RV.ab = null;
+  const root = rvEl();
+  root.innerHTML = `<div class="rv" id="rv">
+    <div class="rv-top"><button class="cbtn" data-rv="close" aria-label="Back">${I.back}</button>
+      <span class="pill label rv-name" id="rvLabel"></span><span class="sp"></span>
+      <span class="rv-nav"><button data-rv="prev" aria-label="Previous clip">${I.chevL}</button><span id="rvIdx"></span><button data-rv="next" aria-label="Next clip">${I.chevR}</button></span>
+      <button class="rv-cmp" data-rv="cmp">${I.cmp}Compare</button></div>
+    <div class="rv-stage" id="rvStage"><video id="rvVid" playsinline autoplay loop></video><div class="rv-hud"></div></div>
+    <div class="rv-dock">
+      <div class="jog" id="rvJog"><div class="ticks"></div><div class="ab" id="rvAb"></div><div class="fill" id="rvFill"></div><div class="head" id="rvHead"></div>
+        <div class="tl"><b id="rvCur">0:00.00</b> / <span id="rvDur"></span></div></div>
+      <div class="rv-row">
+        <button class="rb mono" data-rv="rate" id="rvRate">1×</button>
+        <button class="rb" id="rvFb" aria-label="Back one frame">${I.fb}</button>
+        <button class="rb play" data-rv="play" id="rvPlay" aria-label="Play or pause">${I.pause}</button>
+        <button class="rb" id="rvFf" aria-label="Forward one frame">${I.ff}</button>
+        <button class="rb ab" data-rv="ab" id="rvAbBtn">A–B</button>
+      </div>
+      <div class="rv-row"><button class="rb" data-rv="share" style="flex:1;display:flex;gap:8px;justify-content:center" id="rvShare"></button><button class="rb" data-rv="del" id="rvDel" style="color:var(--danger)">${I.trash}</button></div>
+    </div></div>`;
+  const v = root.querySelector('#rvVid');
+  const ctl = {
+    time: () => v.currentTime, pause: () => { v.pause(); syncPlay(); },
+    seek: t => { v.currentTime = Math.max(0, Math.min((v.duration || 0) - 0.01, t)); },
+    close: closeReview, tap: () => { v.paused ? v.play() : v.pause(); syncPlay(); },
+  };
+  RV.gest = stageGestures(root.querySelector('#rvStage'), [v], ctl);
+  jogBar(root.querySelector('#rvJog'), () => v.duration || 0, ctl.seek);
+  repeatBtn(root.querySelector('#rvFb'), () => { v.pause(); syncPlay(); ctl.seek(v.currentTime - stepOf(RV.cur)); hud(root, '−1 frame'); });
+  repeatBtn(root.querySelector('#rvFf'), () => { v.pause(); syncPlay(); ctl.seek(v.currentTime + stepOf(RV.cur)); hud(root, '+1 frame'); });
+  root.querySelectorAll('[data-rv]').forEach(b => b.onclick = () => rvAction(b.dataset.rv));
+  loadRV();
+  cancelAnimationFrame(RV.raf);
+  const tick = () => {
+    if (!document.getElementById('rvVid')) return;
+    const d = v.duration || 0, t = v.currentTime;
+    if (RV.ab && RV.ab.b != null && (t >= RV.ab.b || t < RV.ab.a - 0.05)) v.currentTime = RV.ab.a;
+    const f = d ? t / d * 100 : 0;
+    root.querySelector('#rvHead').style.left = f + '%'; root.querySelector('#rvFill').style.width = f + '%';
+    root.querySelector('#rvCur').textContent = fmtT(t);
+    RV.raf = requestAnimationFrame(tick);
+  };
+  RV.raf = requestAnimationFrame(tick);
+}
+function syncPlay() {
+  const v = document.getElementById('rvVid'), b = document.getElementById('rvPlay');
+  if (v && b) b.innerHTML = v.paused ? I.play : I.pause;
+}
+function loadRV() {
+  const root = rvEl(), t = RV.list[RV.i]; if (!t) return closeReview();
+  RV.cur = t; RV.ab = null;
+  const v = root.querySelector('#rvVid');
+  v.src = blobURL(t); v.playbackRate = RATES[RV.rate];
+  v.onloadedmetadata = () => { v.playbackRate = RATES[RV.rate]; root.querySelector('#rvDur').textContent = fmtT(v.duration); };
+  v.onplay = v.onpause = syncPlay;
+  v.play().catch(() => syncPlay());
+  RV.gest && RV.gest.reset();
+  root.querySelector('#rvLabel').textContent = `${SHORT[t.cat] || ''} · ${labelOf(t)}`;
+  root.querySelector('#rvIdx').textContent = `${RV.i + 1}/${RV.list.length}`;
+  root.querySelector('[data-rv=prev]').disabled = RV.i === 0;
+  root.querySelector('[data-rv=next]').disabled = RV.i === RV.list.length - 1;
+  root.querySelector('#rvShare').innerHTML = `${I.cloud}&nbsp;${t.sync === 'sent' ? 'Send again' : 'Upload'}`;
+  root.querySelector('#rvDel').innerHTML = I.trash; RV.delSure = false;
+  drawAb();
+}
+function drawAb() {
+  const root = rvEl(), el = root.querySelector('#rvAb'), btn = root.querySelector('#rvAbBtn'), v = root.querySelector('#rvVid');
+  const d = v.duration || 1;
+  btn.classList.toggle('on', !!(RV.ab && RV.ab.b != null)); btn.classList.toggle('half', !!(RV.ab && RV.ab.b == null));
+  btn.textContent = !RV.ab ? 'A–B' : RV.ab.b == null ? 'Set B' : 'A–B ×';
+  if (!RV.ab) { el.style.display = 'none'; return; }
+  el.style.display = 'block'; el.style.left = RV.ab.a / d * 100 + '%';
+  el.style.width = ((RV.ab.b != null ? RV.ab.b : RV.ab.a) - RV.ab.a) / d * 100 + '%';
+}
+async function rvAction(a) {
+  const root = rvEl(), v = root.querySelector('#rvVid'), t = RV.cur;
+  if (a === 'close') closeReview();
+  else if (a === 'prev' && RV.i > 0) { RV.i--; loadRV(); }
+  else if (a === 'next' && RV.i < RV.list.length - 1) { RV.i++; loadRV(); }
+  else if (a === 'play') { v.paused ? v.play() : v.pause(); }
+  else if (a === 'rate') { RV.rate = (RV.rate + 1) % RATES.length; v.playbackRate = RATES[RV.rate];
+    const b = root.querySelector('#rvRate'); b.textContent = ['1×','½×','¼×'][RV.rate]; b.classList.toggle('on', RV.rate > 0); }
+  else if (a === 'ab') {
+    // tap once: A here · again: B here, loop · again: clear
+    if (!RV.ab) RV.ab = { a:v.currentTime, b:null };
+    else if (RV.ab.b == null) { const x = v.currentTime; RV.ab = x > RV.ab.a + 0.05 ? { a:RV.ab.a, b:x } : { a:x, b:RV.ab.a };
+      if (RV.ab.b - RV.ab.a < 0.05) RV.ab = null; else { v.currentTime = RV.ab.a; v.play(); } }
+    else RV.ab = null;
+    drawAb();
+  }
+  else if (a === 'cmp') { v.pause(); pickSecond(t); }
+  else if (a === 'share') { if (await shareTakes([t])) { toast('Uploaded'); loadRV(); render(); } }
+  else if (a === 'del') {
+    const b = root.querySelector('#rvDel');
+    if (!RV.delSure) { RV.delSure = true; b.textContent = 'Delete?'; return; }
+    await dbDel(t.id); S.takes = S.takes.filter(x => x.id !== t.id); RV.list.splice(RV.i, 1);
+    toast('Deleted'); render();
+    if (!RV.list.length) closeReview(); else { RV.i = Math.min(RV.i, RV.list.length - 1); loadRV(); }
+  }
+}
+function closeReview() { cancelAnimationFrame(RV.raf); cancelAnimationFrame(CP.raf); rvEl().innerHTML = ''; }
+
+/* ═════════ pick the second clip ═════════ */
+function pickSecond(first) {
+  // same stroke first, then the rest of the library, newest first
+  const same = S.takes.filter(t => t.id !== first.id && t.strokeId === first.strokeId);
+  const rest = S.takes.filter(t => t.id !== first.id && t.strokeId !== first.strokeId);
+  const tile = t => `<button class="thumb" data-pk="${t.id}"${t.thumb && t.thumb !== 'none' ? ` style="background-image:url(${t.thumb})"` : ''}>
+    <span class="k">${SHORT[t.cat] || ''} · ${esc(labelOf(t))}</span><span class="d">${dayLabel(t.createdAt)}</span></button>`;
+  const d = document.createElement('div'); d.className = 'pick';
+  d.innerHTML = `<div class="sheet"><span class="grab"></span><div class="mh">Compare with</div>
+    ${same.length ? `<div class="lab">${esc(labelOf(first))}</div><div class="grid">${same.map(tile).join('')}</div>` : ''}
+    ${rest.length ? `<div class="lab">Other clips</div><div class="grid">${rest.map(tile).join('')}</div>` : ''}
+    ${!same.length && !rest.length ? '<p style="color:var(--mute);text-align:center">Record another clip to compare against.</p>' : ''}</div>`;
+  d.onclick = e => { if (e.target === d) d.remove(); };
+  d.querySelectorAll('[data-pk]').forEach(b => b.onclick = () => { d.remove(); openCompare(first, S.takes.find(t => t.id === b.dataset.pk)); });
+  rvEl().appendChild(d);
+}
+
+/* ═════════ compare ═════════ */
+const CP = { a:null, b:null, act:'a', link:true, off:0, ghost:false, rate:0, raf:0 };
+function openCompare(a, b) {
+  if (!a || !b) return;
+  cancelAnimationFrame(RV.raf);
+  Object.assign(CP, { a, b, act:'a', link:true, off:0, ghost:false });
+  const root = rvEl();
+  root.innerHTML = `<div class="rv" id="cp">
+    <div class="rv-top"><button class="cbtn" data-cp="close" aria-label="Back">${I.back}</button><span class="sp"></span>
+      <button class="rb" data-cp="swap" style="height:42px" aria-label="Swap">${I.swap}</button>
+      <button class="rb" data-cp="ghost" id="cpGhost" style="height:42px" aria-label="Overlay">${I.ghost}</button></div>
+    <div class="cp-panes" id="cpPanes">
+      <div class="cp-pane a act" data-pane="a"><video playsinline muted loop></video><span class="pill label tag"></span></div>
+      <div class="cp-pane b" data-pane="b"><video playsinline muted loop></video><span class="pill tag"></span><span class="pill off" id="cpOff"></span></div>
+      <div class="rv-hud"></div></div>
+    <div class="rv-dock">
+      <div class="slider" id="cpSlide" hidden>A<input type="range" min="10" max="90" value="50" id="cpOpacity" aria-label="Overlay opacity">B</div>
+      <div class="jog" id="cpJog"><div class="ticks"></div><div class="fill" id="cpFill"></div><div class="head" id="cpHead"></div>
+        <div class="tl"><b id="cpCur">0:00.00</b> <span id="cpWho"></span></div></div>
+      <div class="rv-row">
+        <button class="rb mono" data-cp="rate" id="cpRate">1×</button>
+        <button class="rb" id="cpFb" aria-label="Back one frame">${I.fb}</button>
+        <button class="rb play" data-cp="play" id="cpPlay" aria-label="Play or pause">${I.play}</button>
+        <button class="rb" id="cpFf" aria-label="Forward one frame">${I.ff}</button>
+        <button class="rb on" data-cp="link" id="cpLink" aria-label="Link both clips">${I.linkOn}</button>
+      </div></div></div>`;
+  const va = root.querySelector('[data-pane=a] video'), vb = root.querySelector('[data-pane=b] video');
+  const vids = { a:va, b:vb };
+  const load = () => {
+    va.src = blobURL(CP.a); vb.src = blobURL(CP.b);
+    root.querySelector('[data-pane=a] .tag').textContent = `${SHORT[CP.a.cat] || ''} · ${labelOf(CP.a)} · ${dayLabel(CP.a.createdAt)}`;
+    root.querySelector('[data-pane=b] .tag').textContent = `${SHORT[CP.b.cat] || ''} · ${labelOf(CP.b)} · ${dayLabel(CP.b.createdAt)}`;
+    [va, vb].forEach(v => { v.playbackRate = RATES[CP.rate]; v.onloadedmetadata = () => { v.playbackRate = RATES[CP.rate]; }; });
+    va.currentTime = 0; vb.currentTime = CP.off;
+  };
+  const cur = () => vids[CP.link ? 'a' : CP.act];
+  const both = () => CP.link ? [va, vb] : [vids[CP.act]];
+  const setT = t => {
+    if (CP.link) { va.currentTime = Math.max(0, t); vb.currentTime = Math.max(0, t + CP.off); }
+    else vids[CP.act].currentTime = Math.max(0, t);
+  };
+  const paused = () => va.paused && vb.paused;
+  const syncBtn = () => { root.querySelector('#cpPlay').innerHTML = paused() ? I.play : I.pause; };
+  const pauseAll = () => { va.pause(); vb.pause(); syncBtn(); };
+  const playAll = () => { both().forEach(v => v.play().catch(() => {})); syncBtn(); };
+  load();
+  // tap a pane to make it the one the controls move (when unlinked)
+  root.querySelectorAll('.cp-pane').forEach(p => {
+    const ctl = { time: () => vids[p.dataset.pane].currentTime - (CP.link && p.dataset.pane === 'b' ? CP.off : 0),
+      pause: pauseAll, seek: t => { if (!CP.link) CP.act = p.dataset.pane; setT(t); markAct(); },
+      tap: () => { CP.act = p.dataset.pane; markAct(); } };
+    stageGestures(p, [p.querySelector('video')], ctl);
+  });
+  const markAct = () => {
+    root.querySelectorAll('.cp-pane').forEach(p => p.classList.toggle('act', !CP.link && p.dataset.pane === CP.act));
+    root.querySelector('#cpWho').textContent = CP.link ? '· both' : `· ${CP.act === 'a' ? 'top' : 'bottom'} only`;
+    const o = root.querySelector('#cpOff'); o.textContent = `${CP.off >= 0 ? '+' : ''}${CP.off.toFixed(2)}s`; o.hidden = Math.abs(CP.off) < 0.005;
+  };
+  markAct();
+  jogBar(root.querySelector('#cpJog'), () => cur().duration || 0, t => { pauseAll(); setT(t); });
+  const step = dir => { pauseAll(); const v = cur(), s = stepOf(v === va ? CP.a : CP.b);
+    setT((CP.link ? va.currentTime : v.currentTime) + dir * s); hud(root, (dir > 0 ? '+' : '−') + '1 frame'); };
+  repeatBtn(root.querySelector('#cpFb'), () => step(-1));
+  repeatBtn(root.querySelector('#cpFf'), () => step(1));
+  root.querySelector('#cpOpacity').oninput = e => root.querySelector('#cpPanes').style.setProperty('--ghost', e.target.value / 100);
+  root.querySelectorAll('[data-cp]').forEach(b => b.onclick = () => {
+    const a = b.dataset.cp;
+    if (a === 'close') { closeReview(); }
+    else if (a === 'play') { paused() ? playAll() : pauseAll(); }
+    else if (a === 'rate') { CP.rate = (CP.rate + 1) % RATES.length; [va, vb].forEach(v => v.playbackRate = RATES[CP.rate]);
+      b.textContent = ['1×','½×','¼×'][CP.rate]; b.classList.toggle('on', CP.rate > 0); }
+    else if (a === 'link') {
+      // relinking keeps whatever alignment was set while unlinked
+      if (!CP.link) CP.off = vb.currentTime - va.currentTime;
+      CP.link = !CP.link; b.classList.toggle('on', CP.link); pauseAll(); markAct();
+      hud(root, CP.link ? 'Linked' : 'Unlinked · tap a clip to move it');
+    }
+    else if (a === 'ghost') { CP.ghost = !CP.ghost; root.querySelector('#cpPanes').classList.toggle('ghost', CP.ghost);
+      b.classList.toggle('on', CP.ghost); root.querySelector('#cpSlide').hidden = !CP.ghost; }
+    else if (a === 'swap') { [CP.a, CP.b] = [CP.b, CP.a]; CP.off = -CP.off; pauseAll(); load(); markAct(); }
+  });
+  cancelAnimationFrame(CP.raf);
+  const tick = () => {
+    if (!document.getElementById('cp')) return;
+    // keep the pair in step while playing linked
+    if (CP.link && !va.paused && !vb.paused && Math.abs(vb.currentTime - (va.currentTime + CP.off)) > 0.08) vb.currentTime = va.currentTime + CP.off;
+    const v = cur(), d = v.duration || 0, t = v.currentTime, f = d ? t / d * 100 : 0;
+    root.querySelector('#cpHead').style.left = f + '%'; root.querySelector('#cpFill').style.width = f + '%';
+    root.querySelector('#cpCur').textContent = fmtT(t);
+    CP.raf = requestAnimationFrame(tick);
+  };
+  CP.raf = requestAnimationFrame(tick);
 }
 
 /* ═════════ menus ═════════ */
@@ -678,10 +1033,13 @@ function wire() {
     b.oncontextmenu = e => e.preventDefault();
     b.onclick = () => {
       if (b._held) { b._held = false; return; }
-      if (!S.sel) { S.player = { id:b.dataset.t }; render(); return; }
+      if (!S.sel) { const list = libList(); openReview(list, list.findIndex(t => t.id === b.dataset.t)); return; }
       S.sel.has(b.dataset.t) ? S.sel.delete(b.dataset.t) : S.sel.add(b.dataset.t);
       S.delSure = false; if (!S.sel.size) S.sel = null; render();
     };
+  });
+  $$('[data-cmp]').forEach(b => b.onclick = () => {
+    const [x, y] = S.takes.filter(t => S.sel.has(t.id)); S.sel = null; S.delSure = false; render(); openCompare(x, y);
   });
   $$('[data-cancel]').forEach(b => b.onclick = () => { S.sel = null; S.delSure = false; render(); });
   $$('[data-up]').forEach(b => b.onclick = async () => {
