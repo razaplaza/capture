@@ -485,9 +485,9 @@ function tabs() {
 function recordScreen() {
   const openIdx = CATS.findIndex(c => c[0] === S.open);
   let h = `<div class="top"><span class="word">Record</span><span class="tact">
-    <label class="iconbtn" aria-label="Label a video from Photos">${I.photo}<input type="file" accept="video/*" id="photoPick"></label></span></div><div class="body">`;
+    <label class="iconbtn" aria-label="Label a video from Photos">${I.photo}<input type="file" accept="video/*" id="photoPick" multiple></label></span></div><div class="body">`;
   h += `<button class="whobar${activeP ? ' on' : ''}" data-who><span class="av" style="background:${activeP ? hue(activeP) : '#2a343e'}">${activeP ? esc(initials(activeP)) : 'Me'}</span><span class="wt"><small>Filming</small><b>${activeP ? esc(activeP) : 'Me, my own training'}</b></span><span class="chev">▾</span></button>`;
-  if (S.importFile) h += `<div class="banner"><b>Tap what this video shows</b><button data-cancelimport>Cancel</button></div>`;
+  if (S.importFile) h += `<div class="banner"><b>Tap what ${S.importFile.length > 1 ? 'these ' + S.importFile.length + ' videos show' : 'this video shows'}</b><button data-cancelimport>Cancel</button></div>`;
   h += `<div class="cats">`;
   CATS.forEach((c, i) => {
     const n = S.takes.filter(t => t.cat === c[0]).length;
@@ -1312,17 +1312,19 @@ function wire() {
       if (b._held) { b._held = false; return; }
       const [c, n] = b.dataset.pick.split('|');
       if (S.importFile) {                                    // labelling a video from Photos
-        const f = S.importFile; S.importFile = null;
+        const files = S.importFile; S.importFile = null;
         const hit = cat(c)[2].find(x => x[1] === n);
-        const ts = f.lastModified && f.lastModified > 631152000000 ? f.lastModified : Date.now();
-        await addTake({ strokeId: hit ? hit[0] : idFor(c, n), label:n, blob:f, dur:0, createdAt:ts });
-        toast(`Added to Library · ${SHORT[c]} ${n}`); render(); return;
+        for (const f of files.sort((a, b) => (a.lastModified || 0) - (b.lastModified || 0))) {
+          const ts = f.lastModified && f.lastModified > 631152000000 ? f.lastModified : Date.now();
+          await addTake({ strokeId: hit ? hit[0] : idFor(c, n), label:n, blob:f, dur:0, createdAt:ts });
+        }
+        toast(`Added ${files.length} to Library · ${SHORT[c]} ${n}${activeP ? ' · ' + activeP : ''}`); render(); return;
       }
       openCam(c, n);
     };
   });
   const pp = document.getElementById('photoPick');
-  if (pp) pp.onchange = () => { const f = pp.files[0]; pp.value = ''; if (f) { S.importFile = f; S.tab = 'record'; render(); } };
+  if (pp) pp.onchange = () => { const f = [...pp.files]; pp.value = ''; if (f.length) { S.importFile = f; S.tab = 'record'; render(); } };
   $$('[data-cancelimport]').forEach(b => b.onclick = () => { S.importFile = null; render(); });
   $$('[data-m]').forEach(b => b.onclick = e => {
     e.stopPropagation();
