@@ -153,6 +153,14 @@
   .player video { flex:1; min-height:0; width:100%; object-fit:contain; background:#000; }
   .player .ctop { background:none; }
   .player .pbar { margin-top:0; padding-top:12px; }
+  .whobar { display:flex; align-items:center; gap:12px; width:100%; padding:10px 14px; border:1px solid var(--edge); background:var(--card); border-radius:14px; text-align:left; flex-shrink:0; }
+  .whobar.on { border-color:var(--teal); }
+  .whobar .av { width:36px; height:36px; border-radius:50%; display:grid; place-items:center; font-weight:800; font-size:13px; color:#0d1116; flex-shrink:0; }
+  .whobar .wt { flex:1; min-width:0; } .whobar small { display:block; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--mute); }
+  .whobar b { font-size:17px; } .whobar .chev { color:var(--mute); }
+  .pchips { display:flex; gap:6px; overflow-x:auto; flex-shrink:0; scrollbar-width:none; }
+  .pchip { flex-shrink:0; border:1px solid var(--edge); background:var(--card); border-radius:999px; padding:7px 14px; font-size:13px; font-weight:600; color:var(--mute); white-space:nowrap; }
+  .pchip.on { background:var(--ink); color:#0d1116; border-color:var(--ink); }
   .menu { position:fixed; inset:0; z-index:40; background:rgba(5,8,10,.55); display:flex; flex-direction:column; justify-content:flex-end; }
   .sheet { background:#141b22; border-top:1px solid var(--edge); border-radius:22px 22px 0 0; padding:14px 18px calc(var(--sb) + 22px); display:flex; flex-direction:column; gap:10px; animation:up .2s ease-out; }
   @keyframes up { from { transform:translateY(30px); opacity:0; } }
@@ -333,8 +341,15 @@ const S = {
   tab:'record', takes:[], open:null, adding:null, menu:null, importFile:null,
   sec:'strokes', filter:'all', sel:null, delSure:false,
   recent: (() => { try { return JSON.parse(localStorage.getItem('smaesh_recent') || '[]'); } catch (e) { return []; } })(),
-  cam:null, quick:null, player:null, clearSure:false,
+  cam:null, quick:null, player:null, clearSure:false, pf:'all',
 };
+/* players you coach: everything filmed while one is active is tagged with their name, and the PC files it under them */
+let roster = (() => { try { return JSON.parse(localStorage.getItem('smaesh_roster') || '[]'); } catch (e) { return []; } })();
+let activeP = (() => { try { return localStorage.getItem('smaesh_activeP') || ''; } catch (e) { return ''; } })();
+if (activeP && !roster.includes(activeP)) activeP = '';
+const saveRoster = () => { try { localStorage.setItem('smaesh_roster', JSON.stringify(roster)); localStorage.setItem('smaesh_activeP', activeP); } catch (e) {} };
+const pTag = n => n ? '~p-' + String(n).trim().replace(/\s+/g, '_').replace(/[~\\/:*?"<>|.]/g, '') : '';
+const addPlayer = n => { n = String(n || '').trim().replace(/\s+/g, ' ').slice(0, 24); if (!n) return ''; const hit = roster.find(x => x.toLowerCase() === n.toLowerCase()); if (hit) return hit; roster.push(n); saveRoster(); return n; };
 const saveRecent = () => { try { localStorage.setItem('smaesh_recent', JSON.stringify(S.recent.slice(0, 4))); } catch (e) {} };
 const unsent = () => S.takes.filter(t => t.sync !== 'sent');
 
@@ -428,8 +443,8 @@ async function addTake({ strokeId, label, blob, dur, createdAt, quick, fps }) {
   const ext = /quicktime/.test(type) ? 'mov' : type.includes('mp4') ? 'mp4' : 'webm';
   const d = new Date(createdAt || Date.now());
   const sameDay = S.takes.filter(t => t.strokeId === strokeId && dayLabel(t.createdAt) === dayLabel(d.getTime())).length;
-  const name = `replay~${strokeId}~${stamp(d)}~${sameDay + 1}.${ext}`;
-  const t = { id:uid(), strokeId, cat:catOfId(strokeId), label, name, blob, size:blob.size, dur:dur || 0, createdAt:d.getTime(), sync:'local', quick:!!quick, fps: fps || 0 };
+  const name = `replay~${strokeId}~${stamp(d)}~${sameDay + 1}${pTag(activeP)}.${ext}`;
+  const t = { id:uid(), strokeId, cat:catOfId(strokeId), label, name, blob, size:blob.size, dur:dur || 0, createdAt:d.getTime(), sync:'local', quick:!!quick, fps: fps || 0, player:activeP };
   S.takes.unshift(t);
   await dbPut(t);
   makeThumb(blob).then(async th => { t.thumb = th || 'none'; await dbPut(t); if (S.tab === 'library' && !S.cam && !S.quick) render(); });
@@ -471,6 +486,7 @@ function recordScreen() {
   const openIdx = CATS.findIndex(c => c[0] === S.open);
   let h = `<div class="top"><span class="word">Record</span><span class="tact">
     <label class="iconbtn" aria-label="Label a video from Photos">${I.photo}<input type="file" accept="video/*" id="photoPick"></label></span></div><div class="body">`;
+  h += `<button class="whobar${activeP ? ' on' : ''}" data-who><span class="av" style="background:${activeP ? hue(activeP) : '#2a343e'}">${activeP ? esc(initials(activeP)) : 'Me'}</span><span class="wt"><small>Filming</small><b>${activeP ? esc(activeP) : 'Me, my own training'}</b></span><span class="chev">▾</span></button>`;
   if (S.importFile) h += `<div class="banner"><b>Tap what this video shows</b><button data-cancelimport>Cancel</button></div>`;
   h += `<div class="cats">`;
   CATS.forEach((c, i) => {
@@ -490,13 +506,15 @@ function recordScreen() {
 
 /* ═════════ library ═════════ */
 const secOf = t => STROKE.includes(t.cat) || t.cat === 'quick' ? 'strokes' : t.cat === 'match' ? 'matches' : 'drills';
-const libList = () => S.takes.filter(t => secOf(t) === S.sec && (S.sec !== 'strokes' || S.filter === 'all' || t.cat === S.filter));
+const pOK = t => S.pf === 'all' || (t.player || '') === (S.pf === 'me' ? '' : S.pf);
+const libList = () => S.takes.filter(t => pOK(t) && secOf(t) === S.sec && (S.sec !== 'strokes' || S.filter === 'all' || t.cat === S.filter));
 function libraryScreen() {
   const list = libList();
-  const count = k => S.takes.filter(t => secOf(t) === k).length;
+  const count = k => S.takes.filter(t => pOK(t) && secOf(t) === k).length;
   const n = unsent().length;
   let h = `<div class="top"><span class="word">Library</span></div><div class="body">`;
   h += `<div class="seg">${[['strokes','STROKES'],['matches','MATCHES'],['drills','DRILLS']].map(([k, l]) => `<button data-sec="${k}" class="${S.sec === k ? 'on' : ''}">${l} · ${count(k)}</button>`).join('')}</div>`;
+  if (roster.length) h += `<div class="pchips">${[['all', 'Everyone'], ['me', 'Me'], ...roster.map(n => [n, n])].map(([k, l]) => `<button class="pchip${S.pf === k ? ' on' : ''}" data-pf="${esc(k)}">${esc(l)}</button>`).join('')}</div>`;
   if (S.sec === 'strokes') h += `<div class="chips">${[['all','All'],['fh','FH'],['bh','BH'],['sv','Serve'],['rc','Receive']].map(([k, l]) => `<button class="chip${S.filter === k ? ' on' : ''}" data-f="${k}">${l}</button>`).join('')}</div>`;
   if (n && !S.sel) h += `<div class="up"><span class="bi">${I.cloud}</span><b>${n} not on PC yet</b><button class="go" data-upall>Upload</button></div>`;
   const th = (t, wide) => {
@@ -601,7 +619,7 @@ function camHtml() {
   const last = c.lastThumb ? ` style="background-image:url(${c.lastThumb})"` : '';
   return `<div class="cam"><video class="live" autoplay playsinline muted></video>
     <div class="ctop">${c.rec ? '' : `<button class="cbtn" data-camback aria-label="Back">${I.back}</button>`}
-      <span class="pill label">${SHORT[c.cat]} · ${esc(c.label)}</span>
+      <span class="pill label">${SHORT[c.cat]} · ${esc(c.label)}${activeP ? ' · ' + esc(activeP) : ''}</span>
       <span class="timer${c.rec ? ' rec' : ''}" id="camTimer">0:00</span></div>
     ${c.rec ? '<div style="margin-top:auto"></div>' : `<div class="opts">
       ${lenses.length > 1 ? `<button class="ochip" data-o="lens"><span>lens</span>${cur ? lensLabel(cur) : '1x'}</button>` : ''}
@@ -652,6 +670,7 @@ function quickHtml() {
   }
   return `<div class="cam"><video class="live" autoplay playsinline muted></video>
     <div class="ctop" style="background:none">${q.rec ? '' : `<button class="cbtn" data-q="back" aria-label="Back">${I.back}</button>`}
+      ${activeP ? `<span class="pill label">${esc(activeP)}</span>` : ''}
       ${q.rec ? `<span class="timer rec" id="qSecs">0.0s</span>` : ''}</div>
     <span class="qtip" id="qTip">${q.rec ? 'Recording · let go to stop' : 'Hold to record · up to 10s'}</span>
     <div class="cbot"><span style="width:48px"></span>
@@ -1082,10 +1101,30 @@ function meScreen() {
   h += `<div class="card"><h3>Friends</h3>${M.friends.length ? M.friends.map(f => `<div class="friend"><span class="av" style="background:${hue(f)}">${esc(initials(f))}</span><b>${esc(f)}</b>
       <button data-unfriend="${esc(f)}">Remove</button></div>`).join('') : '<p>Add the name your friend picked.</p>'}
     <div class="field"><input id="friendName" placeholder="Friend's Smæsh name" maxlength="24" autocomplete="off"><button data-me="friend">Add</button></div></div>`;
+  h += `<div class="card"><h3>Players you coach</h3><p>Pick who you are filming on the Record tab. Their clips land under their name on your PC.</p>${roster.length ? roster.map(n => `<div class="friend"><span class="av" style="background:${hue(n)}">${esc(initials(n))}</span><b>${esc(n)}</b>
+      <button data-plx="${esc(n)}">Remove</button></div>`).join('') : ''}
+    <div class="field"><input id="newPlayer" placeholder="Player's name" maxlength="24" autocomplete="off"><button data-pladd>Add</button></div></div>`;
   h += `<div class="card"><h3>Server</h3><p>Where clips are passed between friends. Clips are kept for 48 hours.</p>
     <div class="field"><input id="serverUrl" value="${esc(M.server)}" autocomplete="off" inputmode="url"><button data-me="server">Save</button></div>
     <button class="wide-btn" data-me="test">Test connection</button></div>`;
   return h + `</div>` + tabs();
+}
+
+/* who are you filming? */
+function openWhoSheet() {
+  const d = document.createElement('div'); d.className = 'menu';
+  const row = (name, label, sub) => `<button class="irow" data-pl="${esc(name)}"><span class="av" style="background:${name ? hue(name) : '#2a343e'}">${name ? esc(initials(name)) : 'Me'}</span>
+    <span><div class="who">${esc(label)}</div>${sub ? `<div class="st">${esc(sub)}</div>` : ''}</span><span class="when" style="padding-top:0">${activeP === name ? '●' : ''}</span></button>`;
+  d.innerHTML = `<div class="sheet"><span class="grab"></span><div class="mh">Who are you filming?</div>
+    ${row('', 'Me', 'my own training')}${roster.map(n => row(n, n, S.takes.filter(t => t.player === n).length + ' clips')).join('')}
+    <div class="field"><input id="whoNew" placeholder="New player's name" maxlength="24" autocomplete="off"><button data-go>Add</button></div>
+    <button class="act plain" data-x>Close</button></div>`;
+  const pick = n => { activeP = n; saveRoster(); d.remove(); render(); toast(n ? 'Filming ' + n : 'Filming yourself'); };
+  d.querySelectorAll('[data-pl]').forEach(b => b.onclick = () => pick(b.dataset.pl));
+  d.querySelector('[data-go]').onclick = () => { const n = addPlayer(d.querySelector('#whoNew').value); if (n) pick(n); };
+  d.querySelector('[data-x]').onclick = () => d.remove();
+  d.onclick = e => { if (e.target === d) d.remove(); };
+  document.body.appendChild(d);
 }
 
 /* send sheet: friends first, then any app on the phone */
@@ -1238,6 +1277,10 @@ function wire() {
       catch (e) { toast('Can\'t reach the server: ' + e.message); }
     }
   });
+  $$('[data-who]').forEach(b => b.onclick = openWhoSheet);
+  $$('[data-pf]').forEach(b => b.onclick = () => { S.pf = b.dataset.pf; render(); });
+  $$('[data-pladd]').forEach(b => b.onclick = () => { const i = document.getElementById('newPlayer'); const n = addPlayer(i && i.value); if (n) { toast(n + ' added'); render(); } });
+  $$('[data-plx]').forEach(b => b.onclick = () => { const n = b.dataset.plx; roster = roster.filter(x => x !== n); if (activeP === n) activeP = ''; if (S.pf === n) S.pf = 'all'; saveRoster(); render(); toast(n + ' removed · their clips stay in the Library'); });
   $$('[data-unfriend]').forEach(b => b.onclick = () => { M.friends = M.friends.filter(f => f !== b.dataset.unfriend); LSset('smaesh_friends', M.friends); render(); });
   // record: categories, add, hold to rename/delete
   $$('[data-open]').forEach(b => b.onclick = () => { S.open = S.open === b.dataset.open ? null : b.dataset.open; S.adding = null; render(); });
