@@ -550,20 +550,37 @@ async function listLenses() {
   try { lenses = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'videoinput' && !/front|user|face/i.test(d.label)); } catch (e) { lenses = []; }
 }
 const lensLabel = d => { const l = (d.label || '').toLowerCase(); return l.includes('ultra') ? '0.5x' : l.includes('tele') ? '3x' : '1x'; };
+let idleT = null, streamKey = '';
+const streamLive = () => !!stream && stream.getTracks().length > 0 && stream.getTracks().every(t => t.readyState === 'live');
 async function startStream() {
+  clearTimeout(idleT);
+  const [w, h] = RES[cfg.res];
+  const key = [cfg.res, cfg.fps, facing, cfg.lens || ''].join('|');
+  // a recently used camera is still running: reuse it, so there is no new permission prompt
+  if (streamLive() && key === streamKey) {
+    document.querySelectorAll('video.live').forEach(v => { v.srcObject = stream; });
+    try { wake = await navigator.wakeLock.request('screen'); } catch (e) {}
+    return true;
+  }
   stopStream();
   try {
-    const [w, h] = RES[cfg.res];
     const video = { width:{ ideal:w }, height:{ ideal:h }, frameRate:{ ideal:FPS[cfg.fps] } };
     if (cfg.lens && facing === 'environment') video.deviceId = { exact:cfg.lens }; else video.facingMode = { ideal:facing };
     stream = await navigator.mediaDevices.getUserMedia({ video, audio:true });
+    streamKey = key;
     document.querySelectorAll('video.live').forEach(v => { v.srcObject = stream; });
     try { wake = await navigator.wakeLock.request('screen'); } catch (e) {}
     return true;
   } catch (e) { toast('Camera blocked: ' + e.message); return false; }
 }
+// leaving the camera screen: keep the camera warm for a minute (instant reopen, no new prompt), then switch it off
+function parkStream() {
+  if (wake) { wake.release().catch(() => {}); wake = null; }
+  clearTimeout(idleT);
+  idleT = setTimeout(stopStream, 60000);
+}
 function streamFps() { try { return Math.round(stream.getVideoTracks()[0].getSettings().frameRate) || 0; } catch (e) { return 0; } }
-function stopStream() { if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; } if (wake) { wake.release().catch(() => {}); wake = null; } }
+function stopStream() { clearTimeout(idleT); if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; } if (wake) { wake.release().catch(() => {}); wake = null; } }
 function pickMime() {
   for (const m of ['video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm']) if (window.MediaRecorder && MediaRecorder.isTypeSupported(m)) return m;
   return '';
@@ -620,7 +637,7 @@ function camShutter() {
     c.recorder.stop(); c.rec = false; clearInterval(recTimer); clearTimeout(recLimit); render();
   }
 }
-function closeCam() { if (S.cam && S.cam.rec) return; stopStream(); S.cam = null; render(); }
+function closeCam() { if (S.cam && S.cam.rec) return; parkStream(); S.cam = null; render(); }
 
 /* ═════════ quick camera: hold the record button ═════════ */
 const QMAX = 10000;
@@ -1330,7 +1347,7 @@ function wire() {
   $$('[data-camback]').forEach(b => b.onclick = closeCam);
   $$('[data-camlib]').forEach(b => b.onclick = () => {
     const c = S.cam; if (!c || c.rec) return;
-    stopStream(); S.cam = null; S.tab = 'library';
+    parkStream(); S.cam = null; S.tab = 'library';
     S.sec = STROKE.includes(c.cat) ? 'strokes' : c.cat === 'match' ? 'matches' : 'drills'; S.filter = STROKE.includes(c.cat) ? c.cat : 'all';
     render();
   });
@@ -1349,7 +1366,7 @@ function wire() {
   if (ring) { ring.onpointerdown = e => { e.preventDefault(); quickStart(); }; ring.oncontextmenu = e => e.preventDefault(); }
   $$('[data-q]').forEach(b => b.onclick = async () => {
     const a = b.dataset.q;
-    if (a === 'back') { stopStream(); S.quick = null; render(); }
+    if (a === 'back') { parkStream(); S.quick = null; render(); }
     else if (a === 'discard') { if (!S.quick.saved) toast('Discarded'); quickReset(); }
     else if (a === 'save') { await quickSave(); toast('Saved to Library'); }
     else if (a === 'send') { const q = S.quick; openSendSheet(q.blob, q.to, () => { if (S.quick === q) quickReset(); }); }
@@ -1363,7 +1380,8 @@ document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') {
     if (S.cam && S.cam.rec) camShutter();
     if (S.quick && S.quick.rec) quickStop();
-  } else if ((S.cam || (S.quick && S.quick.mode === 'live')) && !stream) startStream();
+    if (!S.cam && !S.quick) stopStream();
+  } else if ((S.cam || (S.quick && S.quick.mode === 'live')) && !streamLive()) startStream();
 });
 
 if ('serviceWorker' in navigator) {
