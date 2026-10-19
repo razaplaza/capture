@@ -205,7 +205,14 @@
          border-radius:14px; overflow:hidden; touch-action:none; background:rgba(10,12,15,.42); border:1px solid rgba(255,255,255,.12);
          backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
   .jog .ticks { position:absolute; inset:0; background:repeating-linear-gradient(90deg, rgba(255,255,255,.07) 0 1px, transparent 1px 10px); }
-  .jog .ab { position:absolute; top:0; bottom:0; background:rgba(63,210,199,.22); border-left:2px solid var(--teal); border-right:2px solid var(--teal); display:none; }
+  /* loop zone: sits over the timeline, taller than it so the edges are easy to grab */
+  .loopz { position:absolute; z-index:4; left:calc(var(--sl) + 10px); right:calc(var(--sr) + 10px); bottom:var(--sb); height:44px; pointer-events:none; }
+  .loopz .zone { position:absolute; top:0; bottom:0; pointer-events:auto; touch-action:none; border-radius:7px;
+                 background:rgba(63,210,199,.2); border-top:2px solid var(--teal); border-bottom:2px solid var(--teal); }
+  .loopz .hd { position:absolute; top:-3px; bottom:-3px; width:26px; display:flex; justify-content:center; touch-action:none; }
+  .loopz .hd.l { left:-13px; } .loopz .hd.r { right:-13px; }
+  .loopz .hd i { width:9px; height:100%; border-radius:5px; background:var(--teal); box-shadow:0 0 10px rgba(63,210,199,.7);
+                 background-image:linear-gradient(#062825,#062825); background-size:1.5px 14px; background-position:center; background-repeat:no-repeat; }
   .jog .fill { position:absolute; left:0; top:0; bottom:0; background:rgba(63,210,199,.16); }
   .jog .head { position:absolute; top:3px; bottom:3px; width:3px; margin-left:-1.5px; border-radius:2px; background:var(--teal); box-shadow:0 0 8px rgba(63,210,199,.8); }
   .jog .tl { position:absolute; right:10px; top:50%; transform:translateY(-50%); font-family:var(--mono); font-size:11px; color:rgba(255,255,255,.65); pointer-events:none; }
@@ -823,9 +830,10 @@ function openReview(list, i) {
       <button class="fb warn" data-rv="del" id="rvDel" aria-label="Delete">${I.trash}</button></div>
     <div class="fl bl"><button class="fb" data-rv="play" id="rvPlay" aria-label="Play or pause">${I.pause}</button>
       <button class="fb" id="rvFb" aria-label="Back one frame">${I.fb}</button><button class="fb" id="rvFf" aria-label="Forward one frame">${I.ff}</button></div>
-    <div class="fl br"><button class="fb txt" data-rv="rate" id="rvRate">1×</button><button class="fb txt" data-rv="ab" id="rvAbBtn">A–B</button></div>
-    <div class="jog" id="rvJog"><div class="ticks"></div><div class="ab" id="rvAb"></div><div class="fill" id="rvFill"></div><div class="head" id="rvHead"></div>
+    <div class="fl br"><button class="fb txt" data-rv="rate" id="rvRate">1×</button><button class="fb txt" data-rv="ab" id="rvAbBtn">Loop</button></div>
+    <div class="jog" id="rvJog"><div class="ticks"></div><div class="fill" id="rvFill"></div><div class="head" id="rvHead"></div>
       <div class="tl"><b id="rvCur">0:00.00</b> / <span id="rvDur"></span></div></div>
+    <div class="loopz" id="rvLoopz"><div class="zone" id="rvZone" hidden><span class="hd l"><i></i></span><span class="hd r"><i></i></span></div></div>
   </div>`;
   const v = root.querySelector('#rvVid');
   const ctl = {
@@ -838,12 +846,13 @@ function openReview(list, i) {
   repeatBtn(root.querySelector('#rvFb'), () => { v.pause(); syncPlay(); ctl.seek(v.currentTime - stepOf(RV.cur)); hud(root, '−1 frame'); });
   repeatBtn(root.querySelector('#rvFf'), () => { v.pause(); syncPlay(); ctl.seek(v.currentTime + stepOf(RV.cur)); hud(root, '+1 frame'); });
   root.querySelectorAll('[data-rv]').forEach(b => b.onclick = () => rvAction(b.dataset.rv));
+  zoneDrag(root, v);
   loadRV();
   cancelAnimationFrame(RV.raf);
   const tick = () => {
     if (!document.getElementById('rvVid')) return;
     const d = v.duration || 0, t = v.currentTime;
-    if (RV.ab && RV.ab.b != null && (t >= RV.ab.b || t < RV.ab.a - 0.05)) v.currentTime = RV.ab.a;
+    if (RV.ab && !RV.dragging && (t >= RV.ab.b || t < RV.ab.a - 0.05)) v.currentTime = RV.ab.a;
     const f = d ? t / d * 100 : 0;
     root.querySelector('#rvHead').style.left = f + '%'; root.querySelector('#rvFill').style.width = f + '%';
     root.querySelector('#rvCur').textContent = fmtT(t);
@@ -857,10 +866,11 @@ function syncPlay() {
 }
 function loadRV() {
   const root = rvEl(), t = RV.list[RV.i]; if (!t) return closeReview();
-  RV.cur = t; RV.ab = null;
+  RV.cur = t; RV.ab = t.loop ? { a:t.loop.a, b:t.loop.b } : null;   // a clip remembers its loop zone
   const v = root.querySelector('#rvVid');
   v.src = blobURL(t); v.playbackRate = RATES[RV.rate];
-  v.onloadedmetadata = () => { v.playbackRate = RATES[RV.rate]; root.querySelector('#rvDur').textContent = fmtT(v.duration); };
+  v.onloadedmetadata = () => { v.playbackRate = RATES[RV.rate]; root.querySelector('#rvDur').textContent = fmtT(v.duration);
+    if (RV.ab) { RV.ab.b = Math.min(RV.ab.b, v.duration); if (RV.ab.b - RV.ab.a < ABMIN) RV.ab = null; else v.currentTime = RV.ab.a; } drawAb(); };
   v.onplay = v.onpause = syncPlay;
   v.play().catch(() => syncPlay());
   RV.gest && RV.gest.reset();
@@ -872,14 +882,68 @@ function loadRV() {
   const del = root.querySelector('#rvDel'); del.innerHTML = I.trash; del.classList.remove('sure'); RV.delSure = false;
   drawAb();
 }
+/* loop zone: tap Loop for a zone around the playhead; drag its edges to resize, its middle to move it */
+const ABMIN = 0.15;
 function drawAb() {
-  const root = rvEl(), el = root.querySelector('#rvAb'), btn = root.querySelector('#rvAbBtn'), v = root.querySelector('#rvVid');
-  const d = v.duration || 1;
-  btn.classList.toggle('on', !!(RV.ab && RV.ab.b != null)); btn.classList.toggle('half', !!(RV.ab && RV.ab.b == null));
-  btn.textContent = !RV.ab ? 'A–B' : RV.ab.b == null ? 'Set B' : 'A–B ×';
-  if (!RV.ab) { el.style.display = 'none'; return; }
-  el.style.display = 'block'; el.style.left = RV.ab.a / d * 100 + '%';
-  el.style.width = ((RV.ab.b != null ? RV.ab.b : RV.ab.a) - RV.ab.a) / d * 100 + '%';
+  const root = rvEl(), z = root.querySelector('#rvZone'), btn = root.querySelector('#rvAbBtn'), v = root.querySelector('#rvVid');
+  if (!z || !btn || !v) return;
+  btn.classList.toggle('on', !!RV.ab);
+  if (!RV.ab || !v.duration) { z.hidden = true; return; }
+  const d = v.duration;
+  z.hidden = false; z.style.left = RV.ab.a / d * 100 + '%'; z.style.width = (RV.ab.b - RV.ab.a) / d * 100 + '%';
+}
+function saveAb() {
+  const t = RV.cur; if (!t) return;
+  t.loop = RV.ab ? { a:+RV.ab.a.toFixed(3), b:+RV.ab.b.toFixed(3) } : null;
+  dbPut(t).catch(() => {});
+}
+function abToggle(v) {
+  const d = v.duration || 0;
+  if (RV.ab) RV.ab = null;
+  else if (d) {
+    const w = Math.min(d, Math.max(0.6, Math.min(2, d * 0.25)));   // about a stroke's length
+    let a = Math.max(0, v.currentTime - w / 2), b = Math.min(d, a + w); a = Math.max(0, b - w);
+    RV.ab = { a, b };
+    hud(rvEl(), 'Drag the edges');
+  }
+  saveAb(); drawAb();
+}
+function zoneDrag(root, v) {
+  const box = root.querySelector('#rvLoopz'), z = root.querySelector('#rvZone');
+  z.onpointerdown = e => {
+    if (!RV.ab) return;
+    e.preventDefault(); e.stopPropagation();
+    z.setPointerCapture(e.pointerId);
+    const part = e.target.closest('.hd.l') ? 'a' : e.target.closest('.hd.r') ? 'b' : 'm';
+    const r = box.getBoundingClientRect(), d = v.duration || 1, x0 = e.clientX, a0 = RV.ab.a, b0 = RV.ab.b;
+    const wasPlaying = !v.paused;
+    let moved = false;
+    RV.dragging = true;
+    z.onpointermove = ev => {
+      if (!moved && Math.abs(ev.clientX - x0) < 5) return;
+      if (!moved) { moved = true; v.pause(); }
+      const dt = (ev.clientX - x0) / r.width * d;
+      if (part === 'a') RV.ab.a = Math.max(0, Math.min(b0 - ABMIN, a0 + dt));
+      else if (part === 'b') RV.ab.b = Math.min(d, Math.max(a0 + ABMIN, b0 + dt));
+      else { const w = b0 - a0, na = Math.max(0, Math.min(d - w, a0 + dt)); RV.ab.a = na; RV.ab.b = na + w; }
+      v.currentTime = part === 'b' ? Math.max(0, RV.ab.b - 0.02) : RV.ab.a;   // show the frame at the edge you are moving
+      drawAb();
+      hud(root, `${fmtT(RV.ab.a)} – ${fmtT(RV.ab.b)} · ${(RV.ab.b - RV.ab.a).toFixed(2)}s`);
+    };
+    z.onpointerup = z.onpointercancel = ev => {
+      z.onpointermove = null; z.onpointerup = z.onpointercancel = null;
+      if (!moved) {   // a tap inside the zone: jump there
+        const t = (ev.clientX - r.left) / r.width * d;
+        v.currentTime = Math.max(RV.ab.a, Math.min(RV.ab.b - 0.02, t));
+      } else {
+        v.currentTime = RV.ab.a;
+        if (wasPlaying) v.play().catch(() => {});
+        saveAb();
+      }
+      RV.dragging = false;
+      syncPlay();
+    };
+  };
 }
 async function rvAction(a) {
   const root = rvEl(), v = root.querySelector('#rvVid'), t = RV.cur;
@@ -890,12 +954,7 @@ async function rvAction(a) {
   else if (a === 'rate') { RV.rate = (RV.rate + 1) % RATES.length; v.playbackRate = RATES[RV.rate];
     const b = root.querySelector('#rvRate'); b.textContent = ['1×','½×','¼×'][RV.rate]; b.classList.toggle('on', RV.rate > 0); }
   else if (a === 'ab') {
-    // tap once: A here · again: B here, loop · again: clear
-    if (!RV.ab) RV.ab = { a:v.currentTime, b:null };
-    else if (RV.ab.b == null) { const x = v.currentTime; RV.ab = x > RV.ab.a + 0.05 ? { a:RV.ab.a, b:x } : { a:x, b:RV.ab.a };
-      if (RV.ab.b - RV.ab.a < 0.05) RV.ab = null; else { v.currentTime = RV.ab.a; v.play(); } }
-    else RV.ab = null;
-    drawAb();
+    abToggle(v);
   }
   else if (a === 'cmp') { v.pause(); pickSecond(t); }
   else if (a === 'send') { v.pause(); openSendSheet(t.blob); }
