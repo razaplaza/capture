@@ -158,6 +158,16 @@
   .whobar .av { width:36px; height:36px; border-radius:50%; display:grid; place-items:center; font-weight:800; font-size:13px; color:#0d1116; flex-shrink:0; }
   .whobar .wt { flex:1; min-width:0; } .whobar small { display:block; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--mute); }
   .whobar b { font-size:17px; } .whobar .chev { color:var(--mute); }
+  .pdd { position:relative; flex-shrink:0; z-index:5; }
+  .pdd-btn { display:flex; align-items:center; gap:10px; width:100%; padding:8px 12px; border:1px solid var(--edge); background:var(--card); border-radius:14px; text-align:left; }
+  .pdd .av { width:30px; height:30px; font-size:12px; }
+  .pdd-btn b { flex:1; font-size:16px; } .pdd-btn .chev { color:var(--mute); transition:transform .15s; } .pdd.open .chev { transform:rotate(180deg); }
+  .pdd-veil { position:fixed; inset:0; z-index:5; }
+  .pdd-list { position:absolute; left:0; right:0; top:calc(100% + 6px); z-index:6; display:flex; flex-direction:column; gap:2px; max-height:60vh; overflow-y:auto;
+              background:#141b22; border:1px solid var(--edge); border-radius:14px; padding:6px; box-shadow:0 14px 40px rgba(0,0,0,.55); }
+  .prow { display:flex; align-items:center; gap:10px; width:100%; padding:8px; border-radius:10px; text-align:left; }
+  .prow.on { background:var(--card); } .prow b { font-size:15px; } .prow .n { margin-left:auto; color:var(--mute); font-size:13px; }
+  .pdd-list .field { margin-top:4px; }
   .pchips { display:flex; gap:6px; overflow-x:auto; flex-shrink:0; scrollbar-width:none; }
   .pchip { flex-shrink:0; border:1px solid var(--edge); background:var(--card); border-radius:999px; padding:7px 14px; font-size:13px; font-weight:600; color:var(--mute); white-space:nowrap; }
   .pchip.on { background:var(--ink); color:#0d1116; border-color:var(--ink); }
@@ -513,15 +523,26 @@ function recordScreen() {
 
 /* ═════════ library ═════════ */
 const secOf = t => STROKE.includes(t.cat) || t.cat === 'quick' ? 'strokes' : t.cat === 'match' ? 'matches' : 'drills';
-const pOK = t => S.pf === 'all' || (t.player || '') === (S.pf === 'me' ? '' : S.pf);
+const pOK = t => (t.player || '') === activeP;   // the library shows the person you're working with
 const libList = () => S.takes.filter(t => pOK(t) && secOf(t) === S.sec && (S.sec !== 'strokes' || S.filter === 'all' || t.cat === S.filter));
+/* who the library shows: one name, tap to open the list of everyone */
+function personDropdown() {
+  const av = n => `<span class="av" style="background:${n ? hue(n) : '#2a343e'}">${n ? esc(initials(n)) : 'Me'}</span>`;
+  const n = p => S.takes.filter(t => (t.player || '') === p).length;
+  let h = `<div class="pdd${S.pdd ? ' open' : ''}"><button class="pdd-btn" data-pdd>${av(activeP)}<b>${activeP ? esc(activeP) : 'Me'}</b><span class="chev">▾</span></button>`;
+  if (S.pdd) h += `<div class="pdd-veil" data-pddx></div><div class="pdd-list">
+    ${['', ...roster].map(p => `<button class="prow${p === activeP ? ' on' : ''}" data-pset="${esc(p)}">${av(p)}<b>${p ? esc(p) : 'Me'}</b><span class="n">${n(p)}</span></button>`).join('')}
+    <div class="field"><input id="pddNew" placeholder="New player's name" maxlength="24" autocomplete="off"><button data-pddadd>Add</button></div></div>`;
+  return h + `</div>`;
+}
 function libraryScreen() {
   const list = libList();
   const count = k => S.takes.filter(t => pOK(t) && secOf(t) === k).length;
   const n = unsent().length;
   let h = `<div class="top"><span class="word">Library</span></div><div class="body">`;
+  h += personDropdown();
   h += `<div class="seg">${[['strokes','STROKES'],['matches','MATCHES'],['drills','DRILLS']].map(([k, l]) => `<button data-sec="${k}" class="${S.sec === k ? 'on' : ''}">${l} · ${count(k)}</button>`).join('')}</div>`;
-  if (roster.length) h += `<div class="pchips">${[['all', 'Everyone'], ['me', 'Me'], ...roster.map(n => [n, n])].map(([k, l]) => `<button class="pchip${S.pf === k ? ' on' : ''}" data-pf="${esc(k)}">${esc(l)}</button>`).join('')}</div>`;
+
   if (S.sec === 'strokes') h += `<div class="chips">${[['all','All'],['fh','FH'],['bh','BH'],['sv','Serve'],['rc','Receive']].map(([k, l]) => `<button class="chip${S.filter === k ? ' on' : ''}" data-f="${k}">${l}</button>`).join('')}</div>`;
   if (n && !S.sel) h += `<div class="up"><span class="bi">${I.cloud}</span><b>${n} not on PC yet</b><button class="go" data-upall>Upload</button></div>`;
   const th = (t, wide) => {
@@ -1341,7 +1362,10 @@ function wire() {
   });
   $$('[data-who]').forEach(b => b.onclick = openWhoSheet);
   $$('[data-remote]').forEach(b => b.onclick = () => { remoteOn = !remoteOn; try { localStorage.setItem('smaesh_remote', remoteOn ? '1' : '0'); } catch (e) {} render(); });
-  $$('[data-pf]').forEach(b => b.onclick = () => { S.pf = b.dataset.pf; render(); });
+  $$('[data-pdd]').forEach(b => b.onclick = () => { S.pdd = !S.pdd; render(); });
+  $$('[data-pddx]').forEach(b => b.onclick = () => { S.pdd = false; render(); });
+  $$('[data-pset]').forEach(b => b.onclick = () => { activeP = b.dataset.pset; S.pdd = false; S.sel = null; saveRoster(); render(); });
+  $$('[data-pddadd]').forEach(b => b.onclick = () => { const i = document.getElementById('pddNew'); const n = addPlayer(i && i.value); if (n) { activeP = n; S.pdd = false; saveRoster(); render(); toast(n + ' added'); } });
   $$('[data-pladd]').forEach(b => b.onclick = () => { const i = document.getElementById('newPlayer'); const n = addPlayer(i && i.value); if (n) { toast(n + ' added'); render(); } });
   $$('[data-plx]').forEach(b => b.onclick = () => { const n = b.dataset.plx; roster = roster.filter(x => x !== n); if (activeP === n) activeP = ''; if (S.pf === n) S.pf = 'all'; saveRoster(); render(); toast(n + ' removed · their clips stay in the Library'); });
   $$('[data-unfriend]').forEach(b => b.onclick = () => { M.friends = M.friends.filter(f => f !== b.dataset.unfriend); LSset('smaesh_friends', M.friends); render(); });
