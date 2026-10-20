@@ -158,6 +158,24 @@
   .whobar .av { width:36px; height:36px; border-radius:50%; display:grid; place-items:center; font-weight:800; font-size:13px; color:#0d1116; flex-shrink:0; }
   .whobar .wt { flex:1; min-width:0; } .whobar small { display:block; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--mute); }
   .whobar b { font-size:17px; } .whobar .chev { color:var(--mute); }
+  .body.fbody { overflow:hidden; gap:12px; padding-bottom:14px; }
+  .fstage { flex:1; min-height:0; overflow-y:auto; display:flex; flex-direction:column; }
+  .fstage .in { margin:auto 0; display:flex; flex-direction:column; gap:14px; padding:12px 2px; }
+  .fstage .fcard.sel { flex-direction:row; align-items:center; gap:12px; padding:22px 14px 22px 18px; border-color:rgba(63,210,199,.45);
+                        background:linear-gradient(180deg, rgba(63,210,199,.07), rgba(63,210,199,.02)), var(--card); }
+  .fstage .fcard.sel .ft { flex:1; min-width:0; }
+  .fstage .fcard .fx { width:32px; height:32px; border-radius:50%; display:grid; place-items:center; background:rgba(255,255,255,.06); color:var(--mute); font-size:19px; flex-shrink:0; }
+  .fempty { display:grid; place-items:center; color:var(--edge); padding:40px 0; } .fempty svg { width:84px; height:84px; }
+  .fdock { flex-shrink:0; display:flex; flex-direction:column; gap:10px; }
+  .fmeta { text-align:center; color:var(--mute); font-size:13px; }
+  .fin { position:relative; }
+  .fsug { position:absolute; left:0; right:0; bottom:calc(100% + 8px); z-index:8; display:none; flex-direction:column; gap:2px; max-height:46vh; overflow-y:auto;
+          background:#141b22; border:1px solid var(--edge); border-radius:14px; padding:6px; box-shadow:0 -10px 34px rgba(0,0,0,.5); }
+  .fsug.show { display:flex; }
+  .sg { display:flex; align-items:center; gap:10px; width:100%; padding:12px 10px; border-radius:10px; text-align:left; font-size:15.5px; color:#c9d2dc; }
+  .sg:active { background:var(--card); } .sg .tx { flex:1; min-width:0; } .sg .tx b { color:var(--teal); font-weight:800; }
+  .sg.add { color:var(--teal); font-weight:700; }
+  .sg .del { flex-shrink:0; color:var(--mute); font-size:13px; padding:4px 8px; border-radius:8px; } .sg .del:active { background:#2a1416; color:var(--danger); }
   .fgo { flex-shrink:0; background:var(--teal); color:#062825; font-weight:800; font-size:17px; border-radius:14px; padding:16px; }
   .fgo[disabled] { opacity:.35; }
   .fpt { display:flex; align-items:center; gap:12px; width:100%; padding:14px; background:var(--card); border:1px solid var(--edge); border-radius:14px; text-align:left; flex-shrink:0; }
@@ -529,38 +547,72 @@ function pointAvg(pid) {
 }
 const scoreChip = v => `<span class="sc" style="background:${v ? RCOL[Math.round(v)] : '#2a343e'}">${v ? (Number.isInteger(v) ? v : v.toFixed(1)) : '–'}</span>`;
 function focusScreen() {
-  let h = `<div class="top"><span class="word">Focus</span>${!FO.cur && FO.points.length ? `<span class="tact"><button class="tbtn" data-fedit>${S.fedit ? 'Done' : 'Edit'}</button></span>` : ''}</div><div class="body">`;
-  if (FO.cur) {
-    const c = FO.cur, done = c.items.filter(x => x.rating).length;
-    h += `<div class="fhead"><b>Set in progress</b><span>since ${clock(c.started)}${c.player ? ' · ' + esc(c.player) : ''}</span></div>`;
-    h += c.items.map((it, i) => `<div class="fcard"><div class="ft">${esc(it.text)}</div>
-      <div class="rate">${[1, 2, 3, 4, 5].map(n => `<button data-rate="${i}|${n}"${it.rating === n ? ` class="on" style="background:${RCOL[n]};border-color:${RCOL[n]}"` : ''}>${n}</button>`).join('')}</div></div>`).join('');
-    h += `<button class="fgo" data-fdone>Complete set${done < c.items.length ? ` · ${done}/${c.items.length} rated` : ''}</button>
-      <button class="wide-btn${S.fdiscard ? ' sure' : ' danger'}" data-fdiscard>${S.fdiscard ? 'Tap again to discard' : 'Discard set'}</button>`;
+  const top = (btn) => `<div class="top"><span class="word">Focus</span><span class="tact">${btn}</span></div>`;
+  if (S.fhist) {   // history, only when asked for
+    let h = top(`<button class="tbtn" data-fhist>Done</button>`) + `<div class="body">`;
+    h += FO.history.length ? FO.history.map(x => { const r = x.items.filter(i => i.rating), avg = r.length ? r.reduce((a, i) => a + i.rating, 0) / r.length : 0;
+      return `<div class="fhist"><div class="fh1"><b>${dayLabel(x.ended)} · ${clock(x.started)}</b>${x.player ? `<span>${esc(x.player)}</span>` : ''}${scoreChip(avg)}</div>
+        ${x.items.map(i => `<div class="fhr">${scoreChip(i.rating)}<span class="tx">${esc(i.text)}</span></div>`).join('')}</div>`; }).join('')
+      : `<div class="fempty">${I.focus}</div>`;
     return h + `</div>` + tabs();
   }
-  const sel = new Set(FO.sel.filter(id => FO.points.some(p => p.id === id)));
-  h += FO.points.map(p => { const on = sel.has(p.id), a = pointAvg(p.id);
-    return `<button class="fpt${on ? ' on' : ''}" data-fpt="${p.id}"><span class="ck">${on ? '✓' : ''}</span><span class="tx">${esc(p.text)}</span>
-      ${S.fedit ? `<span class="fx" data-fdel="${p.id}">×</span>` : a ? scoreChip(a) : ''}</button>`; }).join('');
-  h += `<div class="field"><input id="fNew" placeholder="Add a point to focus on" maxlength="80" autocomplete="off" enterkeyhint="done"><button data-fadd>Add</button></div>`;
-  h += `<button class="fgo" data-fstart${sel.size ? '' : ' disabled'}>Start set${sel.size ? ` · ${sel.size} point${sel.size === 1 ? '' : 's'}` : ''}</button>`;
-  if (FO.history.length) {
-    const list = S.fall ? FO.history : FO.history.slice(0, 6);
-    h += `<div class="lab">HISTORY</div>` + list.map(x => { const r = x.items.filter(i => i.rating), avg = r.length ? r.reduce((a, i) => a + i.rating, 0) / r.length : 0;
-      return `<div class="fhist"><div class="fh1"><b>${dayLabel(x.ended)} · ${clock(x.started)}</b>${x.player ? `<span>${esc(x.player)}</span>` : ''}${scoreChip(avg)}</div>
-        ${x.items.map(i => `<div class="fhr">${scoreChip(i.rating)}<span class="tx">${esc(i.text)}</span></div>`).join('')}</div>`; }).join('');
-    if (FO.history.length > 6 && !S.fall) h += `<button class="wide-btn" data-fall>Show all ${FO.history.length} sets</button>`;
+  let h = top(FO.history.length && !FO.cur ? `<button class="tbtn" data-fhist>History</button>` : '') + `<div class="body fbody">`;
+  if (FO.cur) {
+    const c = FO.cur, done = c.items.filter(x => x.rating).length;
+    h += `<div class="fstage"><div class="in">${c.items.map((it, i) => `<div class="fcard"><div class="ft">${esc(it.text)}</div>
+      <div class="rate">${[1, 2, 3, 4, 5].map(n => `<button data-rate="${i}|${n}"${it.rating === n ? ` class="on" style="background:${RCOL[n]};border-color:${RCOL[n]}"` : ''}>${n}</button>`).join('')}</div></div>`).join('')}</div></div>`;
+    h += `<div class="fdock">
+      <button class="fgo" data-fdone>Complete set${done < c.items.length ? ` · ${done}/${c.items.length} rated` : ''}</button>
+      <button class="wide-btn${S.fdiscard ? ' sure' : ' danger'}" data-fdiscard>${S.fdiscard ? 'Tap again to discard' : 'Discard set'}</button></div>`;
+    return h + `</div>` + tabs();
   }
+  const chosen = FO.sel.map(id => FO.points.find(p => p.id === id)).filter(Boolean);
+  h += `<div class="fstage"><div class="in">${chosen.length ? chosen.map(p => { const a = pointAvg(p.id);
+      return `<div class="fcard sel"><div class="ft">${esc(p.text)}</div>${a ? scoreChip(a) : ''}<button class="fx" data-funsel="${p.id}" aria-label="Remove">×</button></div>`; }).join('')
+    : `<div class="fempty">${I.focus}</div>`}</div></div>`;
+  h += `<div class="fdock"><div class="fin"><div class="fsug" id="fSug"></div>
+      <div class="field"><input id="fNew" placeholder="Add a point or search your points" maxlength="80" autocomplete="off" enterkeyhint="done"><button data-fadd>Add</button></div></div>
+    <button class="fgo" data-fstart${chosen.length ? '' : ' disabled'}>Start set${chosen.length ? ` · ${chosen.length} point${chosen.length === 1 ? '' : 's'}` : ''}</button></div>`;
   return h + `</div>` + tabs();
+}
+// suggestions while typing: every saved point containing the text, plus "Add …" when it's new
+function focusSuggest() {
+  const inp = document.getElementById('fNew'), box = document.getElementById('fSug'); if (!inp || !box) return;
+  const q = inp.value.trim().replace(/\s+/g, ' '), ql = q.toLowerCase();
+  const pool = FO.points.filter(p => !FO.sel.includes(p.id) && (!ql || p.text.toLowerCase().includes(ql)));
+  pool.sort((a, b) => (ql ? (b.text.toLowerCase().startsWith(ql) - a.text.toLowerCase().startsWith(ql)) : 0) || (b.used || b.created) - (a.used || a.created));
+  const mark = t => { if (!ql) return esc(t); const i = t.toLowerCase().indexOf(ql); return esc(t.slice(0, i)) + '<b>' + esc(t.slice(i, i + q.length)) + '</b>' + esc(t.slice(i + q.length)); };
+  const exact = FO.points.some(p => p.text.toLowerCase() === ql);
+  let h = q && !exact ? `<button class="sg add" data-sgnew>+ Add “${esc(q)}”</button>` : '';
+  h += pool.slice(0, 30).map(p => `<button class="sg" data-sg="${p.id}"><span class="tx">${mark(p.text)}</span>
+    <span class="del" data-sgdel="${p.id}">${S.fdel === p.id ? 'Delete?' : '×'}</span></button>`).join('');
+  box.innerHTML = h;
+  box.classList.toggle('show', document.activeElement === inp && !!h);
+  box.onpointerdown = e => e.preventDefault();   // keep the keyboard up while picking
+  box.querySelectorAll('[data-sg]').forEach(b => b.onclick = e => {
+    const id = b.dataset.sg;
+    if (e.target.closest('[data-sgdel]')) {
+      if (S.fdel !== id) { S.fdel = id; focusSuggest(); return; }
+      FO.points = FO.points.filter(p => p.id !== id); S.fdel = null; saveFocus(); focusSuggest(); return;
+    }
+    pickFocusPoint(id);
+  });
+  const nb = box.querySelector('[data-sgnew]'); if (nb) nb.onclick = addFocusPoint;
+}
+function pickFocusPoint(id) {
+  const p = FO.points.find(x => x.id === id); if (!p) return;
+  p.used = Date.now(); if (!FO.sel.includes(id)) FO.sel = [...FO.sel, id];
+  S.fdel = null; saveFocus(); render();
+  const n = document.getElementById('fNew'); if (n) { n.focus(); focusSuggest(); }
 }
 function addFocusPoint() {
   const i = document.getElementById('fNew'); const v = (i && i.value || '').trim().replace(/\s+/g, ' ');
   if (!v) return;
-  if (FO.points.some(p => p.text.toLowerCase() === v.toLowerCase())) { toast('Already in your list'); return; }
-  const p = { id:uid(), text:v, created:Date.now() };
+  const hit = FO.points.find(p => p.text.toLowerCase() === v.toLowerCase());
+  if (hit) { pickFocusPoint(hit.id); return; }
+  const p = { id:uid(), text:v, created:Date.now(), used:Date.now() };
   FO.points.push(p); FO.sel = [...FO.sel, p.id]; saveFocus(); render();
-  const n = document.getElementById('fNew'); if (n) n.focus();
+  const n = document.getElementById('fNew'); if (n) { n.focus(); focusSuggest(); }
 }
 
 /* ═════════ record ═════════ */
@@ -1428,19 +1480,20 @@ function wire() {
   });
   $$('[data-who]').forEach(b => b.onclick = openWhoSheet);
   $$('[data-remote]').forEach(b => b.onclick = () => { remoteOn = !remoteOn; try { localStorage.setItem('smaesh_remote', remoteOn ? '1' : '0'); } catch (e) {} render(); });
-  $$('[data-fedit]').forEach(b => b.onclick = () => { S.fedit = !S.fedit; render(); });
-  $$('[data-fpt]').forEach(b => b.onclick = e => {
-    const id = b.dataset.fpt;
-    if (e.target.closest('[data-fdel]')) { FO.points = FO.points.filter(p => p.id !== id); FO.sel = FO.sel.filter(x => x !== id); saveFocus(); render(); return; }
-    if (S.fedit) return;
-    FO.sel = FO.sel.includes(id) ? FO.sel.filter(x => x !== id) : [...FO.sel, id]; saveFocus(); render();
-  });
-  $$('[data-fadd]').forEach(b => b.onclick = addFocusPoint);
-  const fNew = document.getElementById('fNew'); if (fNew) fNew.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); addFocusPoint(); } };
+  $$('[data-fhist]').forEach(b => b.onclick = () => { S.fhist = !S.fhist; render(); });
+  $$('[data-funsel]').forEach(b => b.onclick = () => { FO.sel = FO.sel.filter(x => x !== b.dataset.funsel); saveFocus(); render(); });
+  $$('[data-fadd]').forEach(b => { b.onpointerdown = e => e.preventDefault(); b.onclick = addFocusPoint; });
+  const fNew = document.getElementById('fNew');
+  if (fNew) {
+    fNew.oninput = () => { S.fdel = null; focusSuggest(); };
+    fNew.onfocus = focusSuggest;
+    fNew.onblur = () => { const bx = document.getElementById('fSug'); if (bx) bx.classList.remove('show'); S.fdel = null; };
+    fNew.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); addFocusPoint(); } };
+  }
   $$('[data-fstart]').forEach(b => b.onclick = () => {
-    const items = FO.points.filter(p => FO.sel.includes(p.id)).map(p => ({ pid:p.id, text:p.text, rating:null }));
+    const items = FO.sel.map(id => FO.points.find(p => p.id === id)).filter(Boolean).map(p => ({ pid:p.id, text:p.text, rating:null }));
     if (!items.length) return;
-    FO.cur = { id:uid(), started:Date.now(), player:activeP, items }; S.fedit = false; saveFocus(); render();
+    FO.cur = { id:uid(), started:Date.now(), player:activeP, items }; saveFocus(); render();
   });
   $$('[data-rate]').forEach(b => b.onclick = () => {
     const [i, n] = b.dataset.rate.split('|').map(Number), it = FO.cur && FO.cur.items[i]; if (!it) return;
@@ -1453,7 +1506,6 @@ function wire() {
     if (!S.fdiscard) { S.fdiscard = true; render(); return; }
     FO.cur = null; S.fdiscard = false; saveFocus(); render(); toast('Set discarded');
   });
-  $$('[data-fall]').forEach(b => b.onclick = () => { S.fall = true; render(); });
   $$('[data-pdd]').forEach(b => b.onclick = () => { S.pdd = !S.pdd; render(); });
   $$('[data-pddx]').forEach(b => b.onclick = () => { S.pdd = false; render(); });
   $$('[data-pset]').forEach(b => b.onclick = () => { activeP = b.dataset.pset; S.pdd = false; S.sel = null; saveRoster(); render(); });
