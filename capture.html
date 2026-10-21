@@ -1152,7 +1152,17 @@ function camShutter() {
     try { c.recorder = makeRecorder(async blob => {
       if (!blob) return;
       const t = await addTake({ strokeId:c.strokeId, label:c.label, blob, dur:(Date.now() - c.rec0) / 1000, fps:streamFps() });
-      c.takes++; toast(`Saved · ${SHORT[c.cat]} ${c.label} · take ${c.takes}`);
+      c.takes++;
+      if (S.cam === c && !c.rec) {   // done filming: straight to the new take, inside that stroke in the Library
+        parkStream(); S.cam = null; S.tab = 'library'; S.sel = null;
+        S.sec = secOf(t); S.filter = STROKE.includes(c.cat) ? c.cat : 'all';
+        render();
+        const list = S.takes.filter(x => x.strokeId === t.strokeId && (x.player || '') === (t.player || ''));
+        openReview(list, list.findIndex(x => x.id === t.id));
+        toast(`Saved · ${SHORT[c.cat]} ${c.label}`);
+        return;
+      }
+      toast(`Saved · ${SHORT[c.cat]} ${c.label} · take ${c.takes}`);
       const th = await makeThumb(blob); if (th && S.cam === c) { c.lastThumb = th; render(); }
     }); } catch (e) { toast('Recording not supported: ' + e.message); return; }
     c.rec = true; c.rec0 = Date.now(); render();
