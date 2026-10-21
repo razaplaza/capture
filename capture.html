@@ -176,6 +176,52 @@
   .sg:active { background:var(--card); } .sg .tx { flex:1; min-width:0; } .sg .tx b { color:var(--teal); font-weight:800; }
   .sg.add { color:var(--teal); font-weight:700; }
   .sg .del { flex-shrink:0; color:var(--mute); font-size:13px; padding:4px 8px; border-radius:8px; } .sg .del:active { background:#2a1416; color:var(--danger); }
+  /* monthly tests */
+  .lrow2 { display:flex; gap:8px; flex-shrink:0; position:relative; z-index:5; } .lrow2 .pdd { flex:1; min-width:0; }
+  .tbtn2 { flex-shrink:0; display:flex; align-items:center; gap:6px; padding:0 14px; border:1px solid var(--edge); background:var(--card); border-radius:14px; font-weight:700; font-size:14px; }
+  .tbtn2 svg { width:18px; height:18px; color:var(--teal); }
+  #tests .tv { position:fixed; inset:0; z-index:35; background:#0d1116; display:flex; flex-direction:column; }
+  .tv-top { flex-shrink:0; display:flex; align-items:center; gap:12px; padding:calc(var(--st) + 12px) 16px 8px; }
+  .tvb { width:40px; height:40px; border-radius:50%; background:var(--card); border:1px solid var(--edge); display:grid; place-items:center; flex-shrink:0; }
+  .tvb svg { width:20px; height:20px; }
+  .tv-top .tt { flex:1; min-width:0; } .tv-top .tt b { display:block; font-size:19px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .tv-top .tt span { font-size:12.5px; color:var(--mute); }
+  .tv-body { flex:1; min-height:0; overflow-y:auto; padding:6px 16px 16px; display:flex; flex-direction:column; gap:12px; -webkit-overflow-scrolling:touch; }
+  .tv-dock { flex-shrink:0; display:flex; gap:10px; padding:10px 16px calc(var(--sb) + 14px); } .tv-dock > * { flex:1; }
+  .trow { flex-shrink:0; display:flex; flex-direction:column; gap:10px; width:100%; text-align:left; padding:14px; background:var(--card); border:1px solid var(--edge); border-radius:16px; }
+  .th1 { display:flex; align-items:center; gap:8px; } .th1 b { flex:1; min-width:0; font-size:15.5px; } .th1 .chev { color:var(--mute); font-size:20px; line-height:1; }
+  .tstrip { display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; } .tstrip::-webkit-scrollbar { display:none; }
+  .tcell { flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:4px; } .tcell i { font-style:normal; font-size:11px; font-weight:700; color:var(--mute); }
+  .tcell .ti { width:62px; height:78px; border-radius:10px; background:#0d1116 center/cover no-repeat; border:1px solid var(--edge); display:block; }
+  .tcell .tv2 { min-width:60px; min-height:42px; padding:6px 8px; border-radius:10px; background:#0d1116; border:1px solid var(--edge); display:grid; place-items:center; text-align:center;
+                font-family:var(--mono); font-size:12.5px; font-weight:600; line-height:1.35; }
+  .tcell .none { border-style:dashed; opacity:.6; }
+  .tcell.last .ti, .tcell.last .tv2 { border-color:var(--teal); }
+  .trend { font-size:12px; font-weight:800; padding:3px 8px; border-radius:8px; } .trend.up { color:#0d1116; background:var(--gain); } .trend.dn { color:#1a0505; background:var(--danger); } .trend.eq { color:var(--mute); background:#0d1116; }
+  .tprog { display:flex; gap:4px; flex-shrink:0; } .tprog i { flex:1; height:4px; border-radius:2px; background:var(--edge); } .tprog i.on { background:var(--teal); }
+  .twz { margin:auto 0; display:flex; flex-direction:column; gap:16px; padding:10px 0; }
+  .twz .tkind { font-size:11.5px; font-weight:800; letter-spacing:.12em; color:var(--teal); } .twz h2 { font-size:26px; line-height:1.2; }
+  .tlast { display:flex; align-items:center; gap:10px; color:var(--mute); font-size:13.5px; } .tlast img { width:40px; height:50px; object-fit:cover; border-radius:8px; border:1px solid var(--edge); }
+  .tin { display:flex; gap:10px; } .tin label { flex:1; min-width:0; display:flex; flex-direction:column; gap:6px; font-size:11.5px; font-weight:800; letter-spacing:.08em; color:var(--mute); }
+  .tin input { width:100%; background:#141b22; border:1px solid var(--edge); border-radius:14px; padding:16px 10px; color:var(--ink); font-size:26px; font-family:var(--mono); text-align:center; outline:none; }
+  .tin input:focus { border-color:var(--teal); }
+  .tphs { display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; }
+  .tph { position:relative; aspect-ratio:3/4; border-radius:12px; overflow:hidden; background:#141b22 center/cover no-repeat; border:1px solid var(--edge); }
+  .tph .x { position:absolute; right:6px; top:6px; width:28px; height:28px; border-radius:50%; background:rgba(0,0,0,.6); color:#fff; display:grid; place-items:center; font-size:17px; }
+  .tph.add { display:grid; place-items:center; color:var(--teal); font-weight:700; border-style:dashed; cursor:pointer; } .tph.add input { display:none; }
+  .tcmp { display:grid; grid-template-columns:1fr 1fr; gap:8px; flex-shrink:0; } .tcmp figure { margin:0; display:flex; flex-direction:column; gap:6px; }
+  .tcmp img { width:100%; aspect-ratio:3/4; object-fit:cover; border-radius:12px; border:1px solid var(--edge); } .tcmp figcaption { text-align:center; font-size:12.5px; font-weight:700; color:var(--mute); }
+  .tmon { flex-shrink:0; background:var(--card); border:1px solid var(--edge); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:10px; }
+  .tmh { display:flex; align-items:center; gap:10px; } .tmh b { flex:1; } .tmh .v { font-family:var(--mono); font-weight:600; font-size:13.5px; } .tmh button { font-size:13px; font-weight:700; color:var(--teal); padding:4px 6px; }
+  .tmon .tstrip img { width:58px; height:72px; object-fit:cover; border-radius:8px; border:1px solid var(--edge); flex-shrink:0; }
+  .tchart { flex-shrink:0; display:flex; align-items:stretch; gap:6px; height:170px; padding:10px 10px 0; background:var(--card); border:1px solid var(--edge); border-radius:16px; overflow-x:auto; }
+  .tbar { flex:1; min-width:40px; display:flex; flex-direction:column; align-items:center; gap:4px; } .tbar b { font-family:var(--mono); font-size:10.5px; }
+  .tbar .bs { flex:1; width:100%; display:flex; gap:3px; align-items:flex-end; justify-content:center; } .tbar .bs i { width:14px; border-radius:4px 4px 0 0; background:var(--teal); } .tbar .bs i.r { background:#8ae6de; opacity:.65; }
+  .tbar span { font-size:10.5px; font-weight:700; color:var(--mute); padding-bottom:8px; }
+  .tedit { flex-shrink:0; display:flex; align-items:center; gap:6px; padding:8px; background:var(--card); border:1px solid var(--edge); border-radius:14px; }
+  .tedit input { flex:1; min-width:0; background:#0d1116; border:1px solid var(--edge); border-radius:10px; padding:10px; color:var(--ink); font-size:15px; outline:none; } .tedit input:focus { border-color:var(--teal); }
+  .tedit .tg { font-size:12px; font-weight:700; padding:9px 8px; border-radius:9px; border:1px solid var(--edge); color:var(--mute); } .tedit .tg.on { background:var(--teal); color:#062825; border-color:var(--teal); }
+  .tedit .del { color:var(--danger); font-weight:700; padding:8px; font-size:14px; }
+  .tview { position:fixed; inset:0; z-index:40; background:#000; display:flex; flex-direction:column; } .tview img { flex:1; min-height:0; width:100%; object-fit:contain; }
   .fgo { flex-shrink:0; background:var(--teal); color:#062825; font-weight:800; font-size:17px; border-radius:14px; padding:16px; }
   .fgo[disabled] { opacity:.35; }
   .fpt { display:flex; align-items:center; gap:12px; width:100%; padding:14px; background:var(--card); border:1px solid var(--edge); border-radius:14px; text-align:left; flex-shrink:0; }
@@ -334,6 +380,7 @@
 <div class="app" id="app"></div>
 <div id="layer"></div>
 <div id="review"></div>
+<div id="tests"></div>
 <input type="file" id="importPick" accept="video/*" hidden />
 
 <script>
@@ -377,14 +424,19 @@ let _db = null;
 function db() {
   if (_db) return Promise.resolve(_db);
   return new Promise((res, rej) => {
-    const rq = indexedDB.open('replay_capture', 1);
-    rq.onupgradeneeded = e => e.target.result.createObjectStore('takes', { keyPath:'id' });
+    const rq = indexedDB.open('replay_capture', 2);
+    rq.onupgradeneeded = e => { const d = e.target.result;
+      if (!d.objectStoreNames.contains('takes')) d.createObjectStore('takes', { keyPath:'id' });
+      if (!d.objectStoreNames.contains('checks')) d.createObjectStore('checks', { keyPath:'id' }); };
     rq.onsuccess = e => { _db = e.target.result; res(_db); };
     rq.onerror = e => rej(e.target.error);
   });
 }
 async function dbAll() { const d = await db(); return new Promise(res => { const rq = d.transaction('takes').objectStore('takes').getAll(); rq.onsuccess = () => res(rq.result || []); }); }
 async function dbPut(t) { const d = await db(); return new Promise(res => { const tx = d.transaction('takes','readwrite'); tx.objectStore('takes').put(t); tx.oncomplete = res; }); }
+async function chkAll() { const d = await db(); return new Promise(res => { const rq = d.transaction('checks').objectStore('checks').getAll(); rq.onsuccess = () => res(rq.result || []); rq.onerror = () => res([]); }); }
+async function chkPut(e) { const d = await db(); return new Promise(res => { const tx = d.transaction('checks','readwrite'); tx.objectStore('checks').put(e); tx.oncomplete = res; }); }
+async function chkDel(id) { const d = await db(); return new Promise(res => { const tx = d.transaction('checks','readwrite'); tx.objectStore('checks').delete(id); tx.oncomplete = res; }); }
 async function dbDel(id) { const d = await db(); return new Promise(res => { const tx = d.transaction('takes','readwrite'); tx.objectStore('takes').delete(id); tx.oncomplete = res; }); }
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2);
 try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
@@ -436,6 +488,7 @@ const I = {
   msg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-12 7l-6 2 2-6a8 8 0 1 1 16-3z"/></svg>',
   user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/></svg>',
   refresh:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>',
+  tests:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h3"/></svg>',
   focus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/></svg>',
   link:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="12" height="9" rx="1.5"/><path d="M6 17h4M8 13v4"/><rect x="16" y="8" width="6" height="12" rx="1.5"/></svg>',
 };
@@ -615,6 +668,208 @@ function addFocusPoint() {
   const n = document.getElementById('fNew'); if (n) { n.focus(); focusSuggest(); }
 }
 
+/* ═════════ monthly tests: mobility (photos) and endurance (time or reps, optional photos), per person ═════════
+   Lives in #tests over the app, one tap from the Library; results are kept per person and month.          */
+const TDEF = {
+  mobility: [['Apley (Shoulder)'], ['Lying overhead reach (Chest and Back)'], ['Toe touch (Hamstring)'], ['Seated straddle (Inner Thigh)'], ['Deep squat (Ankles and hips)']],
+  endurance: [['Single-leg balance', 'sec', 1], ['Single-leg calf raise', 'reps', 1], ['Single-leg wall sit', 'sec', 1], ['Prone Y hold', 'sec', 0], ['Side plank', 'sec', 1]],
+};
+const TX = (() => {
+  try { const v = JSON.parse(localStorage.getItem('smaesh_tests') || 'null'); if (v && v.mobility && v.endurance) return v; } catch (e) {}
+  const mk = (cat, [name, unit, sides]) => ({ id:cat.slice(0, 3) + '_' + name.toLowerCase().replace(/[^a-z]+/g, '_').replace(/^_|_$/g, '').slice(0, 28), name, unit:unit || 'photo', sides:!!sides });
+  return { mobility:TDEF.mobility.map(d => mk('mobility', d)), endurance:TDEF.endurance.map(d => mk('endurance', d)) };
+})();
+const saveTX = () => { try { localStorage.setItem('smaesh_tests', JSON.stringify(TX)); } catch (e) {} };
+const T = { open:false, cat:'mobility', ex:null, wiz:null, edit:false, photo:null, rows:[], sure:null };
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MONL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const monthKey = d => { d = d ? new Date(d) : new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); };
+const monthLabel = (k, long) => { const [y, m] = k.split('-').map(Number); return (long ? MONL : MON)[m - 1] + (y !== new Date().getFullYear() ? ' ' + y : ''); };
+const exById = id => TX.mobility.find(x => x.id === id) || TX.endurance.find(x => x.id === id) || null;
+const catOfEx = id => TX.mobility.some(x => x.id === id) ? 'mobility' : 'endurance';
+const hasData = e => !!e && (e.v != null || e.l != null || e.r != null || (e.photos && e.photos.length));
+const entryOf = (exId, month) => T.rows.find(r => r.ex === exId && r.month === month) || null;
+const entriesOf = exId => T.rows.filter(r => r.ex === exId && hasData(r)).sort((a, b) => a.month < b.month ? -1 : 1);
+const fmtV = (ex, v) => v == null ? '–' : ex.unit === 'reps' ? String(v) : v >= 60 ? `${Math.floor(v / 60)}:${String(Math.round(v % 60)).padStart(2, '0')}` : `${Math.round(v * 10) / 10}s`;
+const valText = (ex, e) => ex.sides ? `L ${fmtV(ex, e.l)} · R ${fmtV(ex, e.r)}` : fmtV(ex, e.v);
+const scoreOf = (ex, e) => { const xs = (ex.sides ? [e.l, e.r] : [e.v]).filter(x => x != null); return xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null; };
+function parseV(str, unit) {
+  str = String(str || '').trim().replace(',', '.'); if (!str) return null;
+  if (unit !== 'reps' && str.includes(':')) { const [m, s2] = str.split(':'); const v = (+m || 0) * 60 + (+s2 || 0); return isFinite(v) ? v : null; }
+  const v = parseFloat(str); return isFinite(v) ? v : null;
+}
+const purls = new Map();
+const photoURL = p => { if (!purls.has(p.id)) purls.set(p.id, URL.createObjectURL(p.blob)); return purls.get(p.id); };
+function loadImg(file) { return new Promise((res, rej) => { const u = URL.createObjectURL(file), im = new Image(); im.onload = () => { res(im); setTimeout(() => URL.revokeObjectURL(u), 2000); }; im.onerror = rej; im.src = u; }); }
+function shrinkImg(im, max, q) {
+  const k = Math.min(1, max / Math.max(im.naturalWidth, im.naturalHeight)), c = document.createElement('canvas');
+  c.width = Math.round(im.naturalWidth * k); c.height = Math.round(im.naturalHeight * k);
+  c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+  return new Promise(r => c.toBlob(r, 'image/jpeg', q));
+}
+const toDataURL = b => new Promise(r => { const f = new FileReader(); f.onload = () => r(f.result); f.readAsDataURL(b); });
+async function reloadT() { T.rows = (await chkAll()).filter(r => (r.person || '') === activeP); }
+function blankEntry(exId, month) { return { id:`${activeP}|${exId}|${month}`, person:activeP, ex:exId, month, v:null, l:null, r:null, photos:[], at:Date.now() }; }
+async function storeEntry(e) { e.at = Date.now(); if (hasData(e)) await chkPut(e); else await chkDel(e.id); await reloadT(); }
+async function addTestPhotos(exId, month, files) {
+  const e = entryOf(exId, month) || blankEntry(exId, month);
+  toast('Saving photo…');
+  for (const f of files) {
+    try { const im = await loadImg(f); const blob = await shrinkImg(im, 1600, .85), tb = await shrinkImg(im, 360, .72);
+      e.photos.push({ id:uid(), blob, thumb:await toDataURL(tb) }); } catch (err) { toast('Could not read that photo'); }
+  }
+  await storeEntry(e); renderTests();
+}
+async function openTests() { T.open = true; T.ex = null; T.wiz = null; T.photo = null; T.edit = false; await reloadT(); renderTests(); }
+
+function tTop(title, sub, right) {
+  return `<div class="tv-top"><button class="tvb" data-tv="back" aria-label="Back">${I.back}</button><div class="tt"><b>${esc(title)}</b>${sub ? `<span>${esc(sub)}</span>` : ''}</div>${right || ''}</div>`;
+}
+function tList() {
+  const cur = monthKey(), all = [...TX.mobility, ...TX.endurance], done = all.filter(x => hasData(entryOf(x.id, cur))).length;
+  let h = tTop('Tests', activeP || 'Me', `<button class="tbtn" data-tedt>${T.edit ? 'Done' : 'Edit'}</button>`);
+  h += `<div class="tv-body"><div class="seg">${[['mobility', 'MOBILITY'], ['endurance', 'ENDURANCE']].map(([k, l]) => `<button data-tcat="${k}" class="${T.cat === k ? 'on' : ''}">${l}</button>`).join('')}</div>`;
+  if (T.edit) {
+    h += TX[T.cat].map(x => `<div class="tedit"><input data-tren="${x.id}" value="${esc(x.name)}" maxlength="48" autocomplete="off">
+      ${T.cat === 'endurance' ? `<button class="tg${x.unit === 'reps' ? ' on' : ''}" data-tunit="${x.id}">${x.unit === 'reps' ? 'Reps' : 'Time'}</button><button class="tg${x.sides ? ' on' : ''}" data-tsides="${x.id}">L/R</button>` : ''}
+      <button class="del" data-tdel="${x.id}">${T.sure === x.id ? 'Delete?' : '×'}</button></div>`).join('');
+    h += `<div class="field"><input id="tNew" placeholder="New ${T.cat} test" maxlength="48" autocomplete="off"><button data-tadd2>Add</button></div></div>`;
+    return h;
+  }
+  h += TX[T.cat].map(x => {
+    const ents = entriesOf(x.id), last = ents[ents.length - 1], prev = ents[ents.length - 2];
+    let trend = '';
+    if (T.cat === 'endurance' && last && prev) {
+      const a = scoreOf(x, last), b = scoreOf(x, prev);
+      if (a != null && b != null) { const d = a - b; trend = `<span class="trend ${d > 0 ? 'up' : d < 0 ? 'dn' : 'eq'}">${d > 0 ? '▲' : d < 0 ? '▼' : '='} ${d ? (x.unit === 'reps' ? Math.abs(Math.round(d)) : Math.abs(Math.round(d)) + 's') : ''}</span>`; }
+    }
+    const cells = ents.slice(-8).map((e, i, arr) => T.cat === 'mobility'
+      ? `<div class="tcell${i === arr.length - 1 ? ' last' : ''}"><span class="ti"${e.photos[0] ? ` style="background-image:url(${e.photos[0].thumb})"` : ''}></span><i>${monthLabel(e.month)}</i></div>`
+      : `<div class="tcell${i === arr.length - 1 ? ' last' : ''}"><span class="tv2">${x.sides ? `${fmtV(x, e.l)}<br>${fmtV(x, e.r)}` : fmtV(x, e.v)}</span><i>${monthLabel(e.month)}</i></div>`).join('');
+    return `<button class="trow" data-tex="${x.id}"><div class="th1"><b>${esc(x.name)}</b>${trend}<span class="chev">›</span></div>
+      <div class="tstrip">${cells || `<div class="tcell"><span class="${T.cat === 'mobility' ? 'ti' : 'tv2'} none"></span></div>`}</div></button>`;
+  }).join('');
+  h += `</div><div class="tv-dock"><button class="fgo" data-twiz>${done ? 'Continue' : 'Start'} ${MONL[new Date().getMonth()]} check · ${done}/${all.length}</button></div>`;
+  return h;
+}
+function tWizard() {
+  const w = T.wiz, it = w.list[w.i], x = exById(it.id); if (!x) { T.wiz = null; return tList(); }
+  const e = entryOf(x.id, w.month) || blankEntry(x.id, w.month);
+  const before = entriesOf(x.id).filter(r => r.month < w.month).pop();
+  let h = tTop(`${monthLabel(w.month, true)} check`, `${w.i + 1} / ${w.list.length}`);
+  h += `<div class="tv-body"><div class="tprog">${w.list.map((_, i) => `<i class="${i <= w.i ? 'on' : ''}"></i>`).join('')}</div><div class="twz">
+    <div class="tkind">${it.cat === 'mobility' ? 'MOBILITY' : 'ENDURANCE'}</div><h2>${esc(x.name)}</h2>`;
+  if (before) h += `<div class="tlast">${before.photos && before.photos[0] ? `<img src="${before.photos[0].thumb}" alt="">` : ''}<span>${monthLabel(before.month, true)}${it.cat === 'endurance' ? ' · ' + valText(x, before) : ''}</span></div>`;
+  if (it.cat === 'endurance') {
+    const ph = x.unit === 'reps' ? 'reps' : '0:45';
+    h += `<div class="tin">${x.sides
+      ? `<label>LEFT<input data-tval="l" inputmode="decimal" placeholder="${ph}" value="${e.l != null ? (x.unit === 'reps' ? e.l : fmtV(x, e.l).replace('s', '')) : ''}"></label><label>RIGHT<input data-tval="r" inputmode="decimal" placeholder="${ph}" value="${e.r != null ? (x.unit === 'reps' ? e.r : fmtV(x, e.r).replace('s', '')) : ''}"></label>`
+      : `<label>${x.unit === 'reps' ? 'REPS' : 'TIME'}<input data-tval="v" inputmode="decimal" placeholder="${ph}" value="${e.v != null ? (x.unit === 'reps' ? e.v : fmtV(x, e.v).replace('s', '')) : ''}"></label>`}</div>`;
+  }
+  h += `<div class="tphs">${(e.photos || []).map((p, i) => `<div class="tph" style="background-image:url(${p.thumb})"><button class="x" data-tpdel="${i}" aria-label="Remove photo">×</button></div>`).join('')}
+    <label class="tph add">+ Photo<input type="file" accept="image/*" multiple data-tpadd></label></div></div></div>`;
+  h += `<div class="tv-dock"><button class="wide-btn" data-tprev>${w.i ? 'Back' : 'Close'}</button><button class="fgo" data-tnext>${w.i === w.list.length - 1 ? 'Finish' : 'Next'}</button></div>`;
+  return h;
+}
+function tDetail() {
+  const x = exById(T.ex); if (!x) { T.ex = null; return tList(); }
+  const cat = catOfEx(x.id), ents = entriesOf(x.id);
+  let h = tTop(x.name, cat === 'mobility' ? 'Mobility' : 'Endurance') + `<div class="tv-body">`;
+  if (cat === 'mobility' && ents.length > 1) {
+    const a = ents.find(r => r.photos.length), b = [...ents].reverse().find(r => r.photos.length);
+    if (a && b && a !== b) h += `<div class="tcmp"><figure><img src="${photoURL(a.photos[0])}" alt=""><figcaption>${monthLabel(a.month, true)}</figcaption></figure>
+      <figure><img src="${photoURL(b.photos[0])}" alt=""><figcaption>${monthLabel(b.month, true)}</figcaption></figure></div>`;
+  }
+  if (cat === 'endurance' && ents.length) {
+    const vals = ents.flatMap(e => x.sides ? [e.l, e.r] : [e.v]).filter(v => v != null), max = Math.max(1, ...vals);
+    h += `<div class="tchart">${ents.map(e => `<div class="tbar"><b>${fmtV(x, scoreOf(x, e))}</b><div class="bs">${(x.sides ? [['l', e.l], ['r', e.r]] : [['v', e.v]]).map(([k, v]) =>
+      `<i class="${k}" style="height:${v != null ? Math.max(3, v / max * 100) : 0}%"></i>`).join('')}</div><span>${monthLabel(e.month)}</span></div>`).join('')}</div>`;
+  }
+  h += [...ents].reverse().map(e => `<div class="tmon"><div class="tmh"><b>${monthLabel(e.month, true)}</b>${cat === 'endurance' ? `<span class="v">${valText(x, e)}</span>` : ''}<button data-tedit="${e.month}">Edit</button></div>
+    ${e.photos.length ? `<div class="tstrip">${e.photos.map((p, i) => `<img src="${p.thumb}" data-tview="${esc(e.id)}|${i}" alt="">`).join('')}</div>` : ''}</div>`).join('');
+  h += `</div><div class="tv-dock"><button class="fgo" data-tedit="${monthKey()}">${hasData(entryOf(x.id, monthKey())) ? 'Edit' : 'Test'} ${MONL[new Date().getMonth()]}</button></div>`;
+  return h;
+}
+function tViewer() {
+  const e = T.rows.find(r => r.id === T.photo.eid), p = e && e.photos[T.photo.i];
+  if (!p) { T.photo = null; return T.ex ? tDetail() : tList(); }
+  return `<div class="tview"><img src="${photoURL(p)}" alt=""><div class="tv-dock"><button class="wide-btn${T.sure === 'photo' ? ' sure' : ' danger'}" data-tvdel>${T.sure === 'photo' ? 'Tap again to delete' : 'Delete photo'}</button>
+    <button class="fgo" data-tv="back">Close</button></div></div>`;
+}
+function renderTests() {
+  const root = document.getElementById('tests'); if (!root) return;
+  if (!T.open) { root.innerHTML = ''; return; }
+  const scroll = root.querySelector('.tv-body') ? root.querySelector('.tv-body').scrollTop : 0;
+  root.innerHTML = `<div class="tv">${T.photo ? tViewer() : T.wiz ? tWizard() : T.ex ? tDetail() : tList()}</div>`;
+  const b = root.querySelector('.tv-body'); if (b && !T.jump) b.scrollTop = scroll; T.jump = false;
+  wireTests(root);
+}
+function wizRead(root) {   // save what's typed before moving on
+  const w = T.wiz; if (!w) return Promise.resolve();
+  const it = w.list[w.i], x = exById(it.id), inputs = root.querySelectorAll('[data-tval]');
+  if (!inputs.length) return Promise.resolve();
+  const e = entryOf(it.id, w.month) || blankEntry(it.id, w.month);
+  inputs.forEach(inp => { e[inp.dataset.tval] = parseV(inp.value, x.unit); });
+  return storeEntry(e);
+}
+function wireTests(root) {
+  const on = (sel, fn) => root.querySelectorAll(sel).forEach(b => b.onclick = e => fn(b, e));
+  on('[data-tv="back"]', async () => {
+    if (T.photo) T.photo = null;
+    else if (T.wiz) { await wizRead(root); T.wiz = null; }
+    else if (T.ex) T.ex = null;
+    else { T.open = false; T.edit = false; }
+    T.sure = null; T.jump = true; renderTests();
+  });
+  on('[data-tcat]', b => { T.cat = b.dataset.tcat; T.sure = null; T.jump = true; renderTests(); });
+  on('[data-tedt]', () => { T.edit = !T.edit; T.sure = null; renderTests(); });
+  on('[data-tex]', b => { T.ex = b.dataset.tex; T.jump = true; renderTests(); });
+  on('[data-twiz]', () => {
+    const list = [...TX.mobility.map(x => ({ cat:'mobility', id:x.id })), ...TX.endurance.map(x => ({ cat:'endurance', id:x.id }))];
+    const m = monthKey(), first = list.findIndex(it => !hasData(entryOf(it.id, m)));
+    T.wiz = { list, i:Math.max(0, first), month:m }; T.jump = true; renderTests();
+  });
+  on('[data-tedit]', b => { T.wiz = { list:[{ cat:catOfEx(T.ex), id:T.ex }], i:0, month:b.dataset.tedit, single:true }; T.jump = true; renderTests(); });
+  on('[data-tnext]', async () => {
+    await wizRead(root);
+    if (T.wiz.i < T.wiz.list.length - 1) T.wiz.i++;
+    else { const single = T.wiz.single, m = T.wiz.month; T.wiz = null; toast(single ? 'Saved' : `${monthLabel(m, true)} check saved`); }
+    T.jump = true; renderTests();
+  });
+  on('[data-tprev]', async () => { await wizRead(root); if (T.wiz.i > 0) T.wiz.i--; else T.wiz = null; T.jump = true; renderTests(); });
+  root.querySelectorAll('[data-tval]').forEach(inp => { inp.onchange = () => wizRead(root); inp.onkeydown = ev => { if (ev.key === 'Enter') inp.blur(); }; });
+  root.querySelectorAll('[data-tpadd]').forEach(inp => inp.onchange = async () => {
+    const files = [...inp.files]; inp.value = ''; if (!files.length) return;
+    await wizRead(root); const it = T.wiz.list[T.wiz.i]; await addTestPhotos(it.id, T.wiz.month, files);
+  });
+  on('[data-tpdel]', async b => {
+    const it = T.wiz.list[T.wiz.i], e = entryOf(it.id, T.wiz.month); if (!e) return;
+    await wizRead(root); e.photos.splice(+b.dataset.tpdel, 1); await storeEntry(e); renderTests();
+  });
+  on('[data-tview]', b => { const [eid, i] = b.dataset.tview.split('|'); T.photo = { eid, i:+i }; T.sure = null; renderTests(); });
+  on('[data-tvdel]', async () => {
+    if (T.sure !== 'photo') { T.sure = 'photo'; renderTests(); return; }
+    const e = T.rows.find(r => r.id === T.photo.eid); if (e) { e.photos.splice(T.photo.i, 1); await storeEntry(e); }
+    T.photo = null; T.sure = null; toast('Photo deleted'); renderTests();
+  });
+  // editing the list of tests
+  root.querySelectorAll('[data-tren]').forEach(inp => inp.onchange = () => { const x = exById(inp.dataset.tren), v = inp.value.trim(); if (x && v) { x.name = v; saveTX(); } else renderTests(); });
+  on('[data-tunit]', b => { const x = exById(b.dataset.tunit); x.unit = x.unit === 'reps' ? 'sec' : 'reps'; saveTX(); renderTests(); });
+  on('[data-tsides]', b => { const x = exById(b.dataset.tsides); x.sides = !x.sides; saveTX(); renderTests(); });
+  on('[data-tdel]', async b => {
+    const id = b.dataset.tdel;
+    if (T.sure !== id) { T.sure = id; renderTests(); return; }
+    TX[T.cat] = TX[T.cat].filter(x => x.id !== id); saveTX();
+    for (const r of (await chkAll()).filter(r => r.ex === id)) await chkDel(r.id);
+    T.sure = null; await reloadT(); renderTests(); toast('Test removed');
+  });
+  const addT = () => { const i = root.querySelector('#tNew'), v = (i && i.value || '').trim(); if (!v) return;
+    TX[T.cat].push({ id:T.cat.slice(0, 3) + '_' + uid(), name:v, unit:T.cat === 'mobility' ? 'photo' : 'sec', sides:false }); saveTX(); renderTests();
+    const n = document.getElementById('tNew'); if (n) n.focus(); };
+  on('[data-tadd2]', addT);
+  const tn = root.querySelector('#tNew'); if (tn) tn.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); addT(); } };
+}
+
 /* ═════════ record ═════════ */
 function recordScreen() {
   const openIdx = CATS.findIndex(c => c[0] === S.open);
@@ -657,7 +912,7 @@ function libraryScreen() {
   const count = k => S.takes.filter(t => pOK(t) && secOf(t) === k).length;
   const n = unsent().length;
   let h = `<div class="top"><span class="word">Library</span></div><div class="body">`;
-  h += personDropdown();
+  h += `<div class="lrow2">${personDropdown()}<button class="tbtn2" data-topen>${I.tests}Tests</button></div>`;
   h += `<div class="seg">${[['strokes','STROKES'],['matches','MATCHES'],['drills','DRILLS']].map(([k, l]) => `<button data-sec="${k}" class="${S.sec === k ? 'on' : ''}">${l} · ${count(k)}</button>`).join('')}</div>`;
 
   if (S.sec === 'strokes') h += `<div class="chips">${[['all','All'],['fh','FH'],['bh','BH'],['sv','Serve'],['rc','Receive']].map(([k, l]) => `<button class="chip${S.filter === k ? ' on' : ''}" data-f="${k}">${l}</button>`).join('')}</div>`;
@@ -1506,6 +1761,7 @@ function wire() {
     if (!S.fdiscard) { S.fdiscard = true; render(); return; }
     FO.cur = null; S.fdiscard = false; saveFocus(); render(); toast('Set discarded');
   });
+  $$('[data-topen]').forEach(b => b.onclick = openTests);
   $$('[data-pdd]').forEach(b => b.onclick = () => { S.pdd = !S.pdd; render(); });
   $$('[data-pddx]').forEach(b => b.onclick = () => { S.pdd = false; render(); });
   $$('[data-pset]').forEach(b => b.onclick = () => { activeP = b.dataset.pset; S.pdd = false; S.sel = null; saveRoster(); render(); });
