@@ -153,6 +153,10 @@
   .player video { flex:1; min-height:0; width:100%; object-fit:contain; background:#000; }
   .player .ctop { background:none; }
   .player .pbar { margin-top:0; padding-top:12px; }
+  .replay { flex-shrink:0; display:flex; align-items:center; gap:10px; width:100%; padding:14px 16px; border-radius:14px; text-align:left;
+            background:rgba(63,210,199,.12); border:1px solid var(--teal); color:var(--ink); }
+  .replay svg { width:22px; height:22px; color:var(--teal); flex-shrink:0; } .replay span { font-weight:800; color:var(--teal); }
+  .replay b { flex:1; min-width:0; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .replay i { font-style:normal; font-family:var(--mono); font-size:13px; color:var(--mute); }
   .whobar { display:flex; align-items:center; gap:12px; width:100%; padding:10px 14px; border:1px solid var(--edge); background:var(--card); border-radius:14px; text-align:left; flex-shrink:0; }
   .whobar.on { border-color:var(--teal); }
   .whobar .av { width:36px; height:36px; border-radius:50%; display:grid; place-items:center; font-weight:800; font-size:13px; color:#0d1116; flex-shrink:0; }
@@ -984,6 +988,8 @@ function recordScreen() {
   let h = `<div class="top"><span class="word">Record</span><span class="tact">
     <label class="iconbtn" aria-label="Label a video from Photos">${I.photo}<input type="file" accept="video/*" id="photoPick" multiple></label></span></div><div class="body">`;
   h += `<button class="whobar${activeP ? ' on' : ''}" data-who><span class="av" style="background:${activeP ? hue(activeP) : '#2a343e'}">${activeP ? esc(initials(activeP)) : 'Me'}</span><span class="wt"><small>Filming</small><b>${activeP ? esc(activeP) : 'Me, my own training'}</b></span><span class="chev">▾</span></button>`;
+  const lt = S.lastTake && S.takes.find(x => x.id === S.lastTake);
+  if (lt && !S.importFile) h += `<button class="replay" data-replay>${I.play}<span>Replay</span><b>${SHORT[lt.cat] || ''} ${esc(labelOf(lt))}</b><i>${fmtDur(lt.dur)}</i></button>`;
   if (S.importFile) h += `<div class="banner"><b>Tap what ${S.importFile.length > 1 ? 'these ' + S.importFile.length + ' videos show' : 'this video shows'}</b><button data-cancelimport>Cancel</button></div>`;
   h += `<div class="cats">`;
   CATS.forEach((c, i) => {
@@ -1153,13 +1159,10 @@ function camShutter() {
       if (!blob) return;
       const t = await addTake({ strokeId:c.strokeId, label:c.label, blob, dur:(Date.now() - c.rec0) / 1000, fps:streamFps() });
       c.takes++;
-      if (S.cam === c && !c.rec) {   // done filming: straight to the new take, inside that stroke in the Library
-        parkStream(); S.cam = null; S.tab = 'library'; S.sel = null;
-        S.sec = secOf(t); S.filter = STROKE.includes(c.cat) ? c.cat : 'all';
-        render();
-        const list = S.takes.filter(x => x.strokeId === t.strokeId && (x.player || '') === (t.player || ''));
-        openReview(list, list.findIndex(x => x.id === t.id));
-        toast(`Saved · ${SHORT[c.cat]} ${c.label}`);
+      S.lastTake = t.id;                 // the Record tab offers a one-tap replay of it
+      if (S.cam === c && !c.rec) {       // done filming: back to the stroke picker for the next take
+        parkStream(); S.cam = null; S.tab = 'record'; S.open = null; S.adding = null;
+        render(); toast(`Saved · ${SHORT[c.cat]} ${c.label}`);
         return;
       }
       toast(`Saved · ${SHORT[c.cat]} ${c.label} · take ${c.takes}`);
@@ -1881,6 +1884,11 @@ function wire() {
     FO.cur = null; S.fdiscard = false; saveFocus(); render(); toast('Set discarded');
   });
   $$('[data-topen]').forEach(b => b.onclick = openTests);
+  $$('[data-replay]').forEach(b => b.onclick = () => {
+    const t = S.takes.find(x => x.id === S.lastTake); if (!t) return;
+    const list = S.takes.filter(x => x.strokeId === t.strokeId && (x.player || '') === (t.player || ''));
+    openReview(list, list.findIndex(x => x.id === t.id));
+  });
   $$('[data-mgnew]').forEach(b => b.onclick = () => { S.mgnew = !S.mgnew; render(); const n = document.getElementById('mgName'); if (n) n.focus(); });
   $$('[data-mgcreate]').forEach(b => b.onclick = () => {
     const name = (document.getElementById('mgName').value || '').trim(), total = parseInt(document.getElementById('mgTotal').value, 10) || 30;
