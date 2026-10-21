@@ -176,11 +176,36 @@
   .sg:active { background:var(--card); } .sg .tx { flex:1; min-width:0; } .sg .tx b { color:var(--teal); font-weight:800; }
   .sg.add { color:var(--teal); font-weight:700; }
   .sg .del { flex-shrink:0; color:var(--mute); font-size:13px; padding:4px 8px; border-radius:8px; } .sg .del:active { background:#2a1416; color:var(--danger); }
+  /* minigames */
+  .mg { flex-shrink:0; background:var(--card); border:1px solid var(--edge); border-radius:16px; padding:12px; display:flex; flex-direction:column; gap:6px; }
+  .mgh { display:flex; align-items:center; padding:0 2px 4px; } .mgh b { flex:1; font-size:16px; } .mgh button { color:var(--teal); font-weight:700; font-size:14px; padding:4px 6px; }
+  .mgform { display:flex; gap:6px; } .mgform input { min-width:0; background:#0d1116; border:1px solid var(--edge); border-radius:10px; padding:11px 10px; color:var(--ink); font-size:15px; outline:none; }
+  .mgform input:first-child { flex:1; } .mgform input:nth-child(2) { width:56px; text-align:center; font-family:var(--mono); }
+  .mgform button { background:var(--teal); color:#062825; font-weight:700; border-radius:10px; padding:0 12px; }
+  .mgrow { display:flex; align-items:center; gap:10px; width:100%; padding:12px 8px; border-radius:12px; text-align:left; background:#141b22; }
+  .mgrow .nm { flex:1; min-width:0; font-weight:600; } .mgrow .chev { color:var(--mute); font-size:19px; }
+  .mgrow .mgl { font-family:var(--mono); font-weight:600; font-size:14px; } .mgbest { font-size:12px; font-weight:800; color:#ffd15c; }
+  .gplay { margin:auto 0; display:flex; flex-direction:column; align-items:center; gap:18px; padding:20px 0; }
+  .gscore { display:flex; align-items:center; gap:18px; }
+  .gscore input { width:150px; background:transparent; border:none; outline:none; text-align:center; color:var(--ink); font-size:96px; font-weight:800; font-family:var(--ui); font-variant-numeric:tabular-nums; }
+  .gpm { width:72px; height:72px; border-radius:50%; background:var(--card); border:1px solid var(--edge); font-size:38px; font-weight:600; color:var(--teal); }
+  .gpm:active { background:var(--teal); color:#062825; }
+  .gof { color:var(--mute); font-size:20px; font-weight:600; display:flex; align-items:center; gap:8px; }
+  .gof input { width:70px; background:var(--card); border:1px solid var(--edge); border-radius:10px; padding:6px; color:var(--ink); font-size:20px; text-align:center; outline:none; font-family:var(--mono); }
+  .gref { color:var(--mute); font-size:14px; font-weight:600; }
+  .gstats { flex-shrink:0; display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .gs { background:var(--card); border:1px solid var(--edge); border-radius:14px; padding:12px 10px; display:flex; flex-direction:column; gap:2px; }
+  .gs b { font-size:26px; font-weight:800; font-variant-numeric:tabular-nums; } .gs b small { font-size:14px; color:var(--mute); font-weight:700; } .gs span { font-size:12px; color:var(--mute); font-weight:600; }
+  .gs.rec { border-color:#ffd15c; } .gs.rec b { color:#ffd15c; }
+  .gchart .tbar.best .bs i { background:#ffd15c; } .gchart .tbar.fresh b { color:var(--teal); }
+  .grun { flex-shrink:0; display:flex; align-items:center; gap:10px; padding:12px; background:var(--card); border:1px solid var(--edge); border-radius:12px; }
+  .grun .gd { flex:1; color:var(--mute); font-size:13.5px; } .grun b { font-family:var(--mono); font-size:15px; } .grun.best b { color:#ffd15c; }
+  .grun .gx { color:var(--mute); font-size:13px; font-weight:700; padding:2px 6px; }
   /* monthly tests */
   .lrow2 { display:flex; gap:8px; flex-shrink:0; position:relative; z-index:5; } .lrow2 .pdd { flex:1; min-width:0; }
   .tbtn2 { flex-shrink:0; display:flex; align-items:center; gap:6px; padding:0 14px; border:1px solid var(--edge); background:var(--card); border-radius:14px; font-weight:700; font-size:14px; }
   .tbtn2 svg { width:18px; height:18px; color:var(--teal); }
-  #tests .tv { position:fixed; inset:0; z-index:35; background:#0d1116; display:flex; flex-direction:column; }
+  #tests .tv, #games .tv { position:fixed; inset:0; z-index:35; background:#0d1116; display:flex; flex-direction:column; }
   .tv-top { flex-shrink:0; display:flex; align-items:center; gap:12px; padding:calc(var(--st) + 12px) 16px 8px; }
   .tvb { width:40px; height:40px; border-radius:50%; background:var(--card); border:1px solid var(--edge); display:grid; place-items:center; flex-shrink:0; }
   .tvb svg { width:20px; height:20px; }
@@ -381,6 +406,7 @@
 <div id="layer"></div>
 <div id="review"></div>
 <div id="tests"></div>
+<div id="games"></div>
 <input type="file" id="importPick" accept="video/*" hidden />
 
 <script>
@@ -870,6 +896,88 @@ function wireTests(root) {
   const tn = root.querySelector('#tNew'); if (tn) tn.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); addT(); } };
 }
 
+/* ═════════ minigames: name a drill, play a round, score it, beat your record ═════════ */
+const GM = (() => { const d = { games:[], runs:[] };
+  try { return Object.assign(d, JSON.parse(localStorage.getItem('smaesh_games') || '{}')); } catch (e) { return d; } })();
+const saveGM = () => { try { localStorage.setItem('smaesh_games', JSON.stringify(GM)); } catch (e) {} };
+const G = { open:null, play:null, edit:false, sure:null, rec:null };
+const gRuns = gid => GM.runs.filter(r => r.game === gid && (r.person || '') === activeP).sort((a, b) => a.at - b.at);
+const pct = r => r.total ? r.score / r.total : 0;
+const gBest = runs => runs.reduce((b, r) => !b || pct(r) > pct(b) ? r : b, null);
+function minigamesBlock() {
+  let h = `<div class="mg"><div class="mgh"><b>Minigames</b><button data-mgnew>${S.mgnew ? 'Cancel' : '+ New'}</button></div>`;
+  if (S.mgnew) h += `<div class="mgform"><input id="mgName" placeholder="Name, e.g. BH loop vs underspin" maxlength="48" autocomplete="off">
+    <input id="mgTotal" inputmode="numeric" value="30" maxlength="4" aria-label="Balls per round"><button data-mgcreate>Create</button></div>`;
+  h += GM.games.map(g => { const runs = gRuns(g.id), last = runs[runs.length - 1], best = gBest(runs);
+    return `<button class="mgrow" data-mg="${g.id}"><span class="nm">${esc(g.name)}</span>
+      ${best ? `<span class="mgbest">★ ${best.score}/${best.total}</span>` : ''}<span class="mgl">${last ? `${last.score}/${last.total}` : '–'}</span><span class="chev">›</span></button>`; }).join('');
+  return h + `</div>`;
+}
+function gameHtml() {
+  const g = GM.games.find(x => x.id === G.open); if (!g) { G.open = null; return ''; }
+  const runs = gRuns(g.id), best = gBest(runs), last = runs[runs.length - 1];
+  if (G.play) {
+    const p = G.play;
+    return tTop(g.name, activeP || 'Me') + `<div class="tv-body"><div class="gplay">
+        <div class="gscore"><button class="gpm" data-gstep="-1" aria-label="One less">−</button>
+          <input id="gScore" inputmode="numeric" value="${p.score}" aria-label="Score"><button class="gpm" data-gstep="1" aria-label="One more">+</button></div>
+        <div class="gof">of <input id="gTotal" inputmode="numeric" value="${p.total}" aria-label="Balls"></div>
+        ${best ? `<div class="gref">★ Record ${best.score}/${best.total}${last ? ` · Last ${last.score}/${last.total}` : ''}</div>` : ''}
+      </div></div><div class="tv-dock"><button class="wide-btn" data-gcancel>Cancel</button><button class="fgo" data-gsave>Save score</button></div>`;
+  }
+  let h = tTop(g.name, activeP || 'Me', `<button class="tbtn" data-gedit>${G.edit ? 'Done' : 'Edit'}</button>`) + `<div class="tv-body">`;
+  if (G.edit) {
+    h += `<div class="tedit"><input id="gRen" value="${esc(g.name)}" maxlength="48" autocomplete="off"></div>
+      <div class="tedit"><span style="padding:0 6px;color:var(--mute);font-weight:700">Balls per round</span><input id="gTot" inputmode="numeric" value="${g.total}" style="max-width:90px;text-align:center"></div>
+      <button class="wide-btn${G.sure === 'game' ? ' sure' : ' danger'}" data-gdel>${G.sure === 'game' ? 'Tap again to delete game and scores' : 'Delete game'}</button></div>`;
+    return h;
+  }
+  if (runs.length) {
+    const avg5 = runs.slice(-5).reduce((a, r) => a + pct(r), 0) / Math.min(5, runs.length);
+    h += `<div class="gstats"><div class="gs rec"><b>${best.score}<small>/${best.total}</small></b><span>Record</span></div>
+      <div class="gs"><b>${last.score}<small>/${last.total}</small></b><span>Last</span></div>
+      <div class="gs"><b>${Math.round(avg5 * 100)}%</b><span>Avg last ${Math.min(5, runs.length)}</span></div></div>`;
+    const shown = runs.slice(-14);
+    h += `<div class="tchart gchart">${shown.map(r => `<div class="tbar${r === best ? ' best' : ''}${r.id === G.rec ? ' fresh' : ''}"><b>${r.score}</b><div class="bs"><i style="height:${Math.max(3, pct(r) * 100)}%"></i></div>
+      <span>${new Date(r.at).getDate()}.${new Date(r.at).getMonth() + 1}</span></div>`).join('')}</div>`;
+    h += [...runs].reverse().map((r, i, arr) => { const prev = arr[i + 1], d = prev ? Math.round((pct(r) - pct(prev)) * 100) : null;
+      return `<div class="grun${r === best ? ' best' : ''}"><span class="gd">${dayLabel(r.at)} · ${clock(r.at)}</span>
+        ${d != null && d !== 0 ? `<span class="trend ${d > 0 ? 'up' : 'dn'}">${d > 0 ? '▲' : '▼'} ${Math.abs(d)}%</span>` : ''}
+        <b>${r.score}/${r.total}</b><button class="gx" data-grdel="${r.id}">${G.sure === r.id ? 'Delete?' : '×'}</button></div>`; }).join('');
+  } else h += `<div class="fempty">${I.dr}</div>`;
+  return h + `</div><div class="tv-dock"><button class="fgo" data-gplay>Play round</button></div>`;
+}
+function renderGame() {
+  const root = document.getElementById('games'); if (!root) return;
+  if (!G.open) { root.innerHTML = ''; return; }
+  root.innerHTML = `<div class="tv">${gameHtml()}</div>`;
+  const on = (sel, fn) => root.querySelectorAll(sel).forEach(b => b.onclick = e => fn(b, e));
+  const g = GM.games.find(x => x.id === G.open);
+  on('[data-tv="back"]', () => { if (G.play) G.play = null; else { G.open = null; G.edit = false; render(); } G.sure = null; renderGame(); });
+  on('[data-gedit]', () => { G.edit = !G.edit; G.sure = null; renderGame(); });
+  on('[data-gplay]', () => { G.play = { score:0, total:g.total }; G.rec = null; renderGame(); });
+  on('[data-gcancel]', () => { G.play = null; renderGame(); });
+  const sc = root.querySelector('#gScore'), tt = root.querySelector('#gTotal');
+  const readPlay = () => { G.play.total = Math.max(1, parseInt(tt.value, 10) || g.total); G.play.score = Math.max(0, Math.min(G.play.total, parseInt(sc.value, 10) || 0)); };
+  on('[data-gstep]', b => { readPlay(); G.play.score = Math.max(0, Math.min(G.play.total, G.play.score + +b.dataset.gstep)); sc.value = G.play.score; });
+  if (sc) { sc.onfocus = () => sc.select(); sc.onchange = () => { readPlay(); sc.value = G.play.score; }; }
+  on('[data-gsave]', () => {
+    readPlay();
+    const before = gBest(gRuns(g.id));
+    const run = { id:uid(), game:g.id, person:activeP, score:G.play.score, total:G.play.total, at:Date.now() };
+    GM.runs.push(run); saveGM(); G.play = null; G.rec = run.id;
+    toast(!before ? 'First score saved' : pct(run) > pct(before) ? `New record! ${run.score}/${run.total}` : `Saved ${run.score}/${run.total}`);
+    renderGame(); render();
+  });
+  on('[data-grdel]', b => { const id = b.dataset.grdel; if (G.sure !== id) { G.sure = id; renderGame(); return; }
+    GM.runs = GM.runs.filter(r => r.id !== id); G.sure = null; saveGM(); renderGame(); render(); });
+  const ren = root.querySelector('#gRen'); if (ren) ren.onchange = () => { const v = ren.value.trim(); if (v) { g.name = v; saveGM(); render(); } };
+  const tot = root.querySelector('#gTot'); if (tot) tot.onchange = () => { const v = parseInt(tot.value, 10); if (v > 0) { g.total = v; saveGM(); } };
+  on('[data-gdel]', () => { if (G.sure !== 'game') { G.sure = 'game'; renderGame(); return; }
+    GM.games = GM.games.filter(x => x.id !== g.id); GM.runs = GM.runs.filter(r => r.game !== g.id); saveGM();
+    G.open = null; G.edit = false; G.sure = null; renderGame(); render(); toast('Game deleted'); });
+}
+
 /* ═════════ record ═════════ */
 function recordScreen() {
   const openIdx = CATS.findIndex(c => c[0] === S.open);
@@ -923,6 +1031,7 @@ function libraryScreen() {
     const bg = t.thumb && t.thumb !== 'none' ? ` style="background-image:url(${t.thumb})"` : '';
     return `<button class="thumb${wide ? ' wide' : ''}${on ? ' sel' : ''}" data-t="${t.id}"${bg}>${wide ? '' : `<span class="k">${SHORT[t.cat] || ''} · ${esc(labelOf(t))}</span>`}${mark}<span class="d">${fmtDur(t.dur)}</span></button>`;
   };
+  if (S.sec === 'drills') h += minigamesBlock();
   if (!list.length) h += `<div class="empty">${I[S.sec === 'matches' ? 'match' : S.sec === 'drills' ? 'dr' : 'fh']}<span>Nothing here yet</span><button data-tab="record">Record</button></div>`;
   else if (S.sec === 'matches') h += list.map(t => `<div class="mcard">${th(t, true)}<span class="mt"><b>${esc(labelOf(t))}</b><span>${dayLabel(t.createdAt)} · ${fmtDur(t.dur)}</span></span></div>`).join('');
   else {
@@ -1762,6 +1871,14 @@ function wire() {
     FO.cur = null; S.fdiscard = false; saveFocus(); render(); toast('Set discarded');
   });
   $$('[data-topen]').forEach(b => b.onclick = openTests);
+  $$('[data-mgnew]').forEach(b => b.onclick = () => { S.mgnew = !S.mgnew; render(); const n = document.getElementById('mgName'); if (n) n.focus(); });
+  $$('[data-mgcreate]').forEach(b => b.onclick = () => {
+    const name = (document.getElementById('mgName').value || '').trim(), total = parseInt(document.getElementById('mgTotal').value, 10) || 30;
+    if (!name) { toast('Give the game a name'); return; }
+    const g = { id:uid(), name, total, created:Date.now() }; GM.games.push(g); saveGM(); S.mgnew = false;
+    G.open = g.id; G.play = null; G.edit = false; render(); renderGame();
+  });
+  $$('[data-mg]').forEach(b => b.onclick = () => { G.open = b.dataset.mg; G.play = null; G.edit = false; G.rec = null; renderGame(); });
   $$('[data-pdd]').forEach(b => b.onclick = () => { S.pdd = !S.pdd; render(); });
   $$('[data-pddx]').forEach(b => b.onclick = () => { S.pdd = false; render(); });
   $$('[data-pset]').forEach(b => b.onclick = () => { activeP = b.dataset.pset; S.pdd = false; S.sel = null; saveRoster(); render(); });
